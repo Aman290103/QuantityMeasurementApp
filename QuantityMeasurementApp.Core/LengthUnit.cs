@@ -3,7 +3,9 @@ namespace QuantityMeasurementApp.Core
     public enum LengthUnit
     {
         Feet,
-        Inch
+        Inch,
+        Yard,
+        Centimeter
     }
 
     public static class LengthUnitExtensions
@@ -14,8 +16,16 @@ namespace QuantityMeasurementApp.Core
             {
                 return value * 12.0;
             }
+            if (unit == LengthUnit.Yard)
+            {
+                return value * 36.0;
+            }
+            if (unit == LengthUnit.Centimeter)
+            {
+                return value * 0.393701;
+            }
             
-            return value * 1.0;
+            return value; 
         }
     }
 }
