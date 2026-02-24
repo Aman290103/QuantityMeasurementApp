@@ -1,4 +1,3 @@
-
 using System;
 
 namespace QuantityMeasurementApp.Core
@@ -78,17 +77,32 @@ namespace QuantityMeasurementApp.Core
 
 
         //methods for addition
-        public QuantityLength Add(QuantityLength other)
+        private QuantityLength AddInternal(QuantityLength other, LengthUnit targetUnit)
         {
             if (other == null)
             {
                 throw new ArgumentNullException(nameof(other));
             }
 
-            double convertedOtherValue = other.ConvertTo(this.unit);
-            double sumValue = Math.Round(this.value + convertedOtherValue, 5);
+            double thisBase = this.unit.GetBaseValue(this.value);
+            double otherBase = other.unit.GetBaseValue(other.value);
+            
+            double sumBase = thisBase + otherBase;
+            double targetFactor = targetUnit.GetConversionFactor();
+            
+            double sumTarget = targetFactor == 0 ? 0 : sumBase / targetFactor;
 
-            return new QuantityLength(sumValue, this.unit);
+            return new QuantityLength(Math.Round(sumTarget, 5), targetUnit);
+        }
+
+        public QuantityLength Add(QuantityLength other)
+        {
+            return AddInternal(other, this.unit);
+        }
+
+        public QuantityLength Add(QuantityLength other, LengthUnit targetUnit)
+        {
+            return AddInternal(other, targetUnit);
         }
 
         public static QuantityLength Add(QuantityLength first, QuantityLength second)
@@ -99,6 +113,16 @@ namespace QuantityMeasurementApp.Core
             }
             
             return first.Add(second);
+        }
+
+        public static QuantityLength Add(QuantityLength first, QuantityLength second, LengthUnit targetUnit)
+        {
+            if (first == null)
+            {
+                throw new ArgumentNullException(nameof(first));
+            }
+            
+            return first.Add(second, targetUnit);
         }
     }
 }

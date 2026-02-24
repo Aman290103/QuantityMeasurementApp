@@ -9,59 +9,22 @@ namespace QuantityMeasurementApp.App
         {
             Console.WriteLine("--- Quantity Measurement App Demo ---\n");
 
-            demonstrateLengthConversion(1.0, LengthUnit.Feet, LengthUnit.Inch);
-            demonstrateLengthConversion(1.0, LengthUnit.Yard, LengthUnit.Feet);
-            demonstrateLengthConversion(1.0, LengthUnit.Centimeter, LengthUnit.Inch);
+            QuantityLength length1 = new QuantityLength(1.0, LengthUnit.Feet);
+            QuantityLength length2 = new QuantityLength(12.0, LengthUnit.Inch);
 
-            Console.WriteLine();
+            QuantityLength resultFeet = QuantityLength.Add(length1, length2, LengthUnit.Feet);
+            Console.WriteLine($"Output: Quantity({resultFeet})");
 
-            QuantityLength qty = new QuantityLength(36.0, LengthUnit.Inch);
-            demonstrateLengthConversion(qty, LengthUnit.Yard);
+            QuantityLength resultInches = QuantityLength.Add(length1, length2, LengthUnit.Inch);
+            Console.WriteLine($"Output: Quantity({resultInches})");
 
-            Console.WriteLine();
+            QuantityLength resultYards = QuantityLength.Add(length1, length2, LengthUnit.Yard);
+            Console.WriteLine($"Output: Quantity({resultYards})");
 
-            QuantityLength q1 = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength q2 = new QuantityLength(3.0, LengthUnit.Feet);
-            demonstrateLengthEquality(q1, q2);
-
-            demonstrateLengthComparison(2.0, LengthUnit.Inch, 5.0, LengthUnit.Centimeter);
-
-            Console.WriteLine();
-
-            demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.Feet), new QuantityLength(2.0, LengthUnit.Feet));
-            demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.Feet), new QuantityLength(12.0, LengthUnit.Inch));
-            demonstrateLengthAddition(new QuantityLength(12.0, LengthUnit.Inch), new QuantityLength(1.0, LengthUnit.Feet));
-        }
-
-        public static void demonstrateLengthConversion(double value, LengthUnit source, LengthUnit target)
-        {
-            QuantityLength quantity = new QuantityLength(value, source);
-            double result = quantity.ConvertTo(target);
-            Console.WriteLine($"Converted: {value} {source} -> {result} {target}");
-        }
-
-        public static void demonstrateLengthConversion(QuantityLength quantity, LengthUnit target)
-        {
-            double result = quantity.ConvertTo(target);
-            Console.WriteLine($"Converted Object: {quantity} -> {result} {target}");
-        }
-
-        public static void demonstrateLengthEquality(QuantityLength q1, QuantityLength q2)
-        {
-            Console.WriteLine($"Equality Check: {q1} == {q2} ? {q1.Equals(q2)}");
-        }
-
-        public static void demonstrateLengthComparison(double v1, LengthUnit u1, double v2, LengthUnit u2)
-        {
-            QuantityLength q1 = new QuantityLength(v1, u1);
-            QuantityLength q2 = new QuantityLength(v2, u2);
-            demonstrateLengthEquality(q1, q2);
-        }
-
-        public static void demonstrateLengthAddition(QuantityLength length1, QuantityLength length2)
-        {
-            QuantityLength result = length1.Add(length2);
-            Console.WriteLine($"Added: {length1} + {length2} = {result}");
+            QuantityLength length3 = new QuantityLength(1.0, LengthUnit.Yard);
+            QuantityLength length4 = new QuantityLength(3.0, LengthUnit.Feet);
+            QuantityLength resultYardToYard = QuantityLength.Add(length3, length4, LengthUnit.Yard);
+            Console.WriteLine($"Output: Quantity({resultYardToYard})");
         }
     }
 }
