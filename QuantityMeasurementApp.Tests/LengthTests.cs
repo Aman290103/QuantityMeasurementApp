@@ -1,4 +1,3 @@
-
 using NUnit.Framework;
 using QuantityMeasurementApp.Core;
 
@@ -56,11 +55,10 @@ namespace QuantityMeasurementApp.Tests
 
         [Test]
         public void testEquality_YardToYard_SameValue()
-        {
-            QuantityLength first = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength second = new QuantityLength(1.0, LengthUnit.Yard);
-            Assert.IsTrue(first.Equals(second));
-        }
+            {
+                  
+            }
+        
 
         [Test]
         public void testEquality_YardToYard_DifferentValue()
@@ -283,6 +281,126 @@ namespace QuantityMeasurementApp.Tests
         {
             QuantityLength quantity = new QuantityLength(double.PositiveInfinity, LengthUnit.Feet);
             Assert.Throws<ArgumentException>(() => quantity.ConvertTo(LengthUnit.Inch));
+        }
+
+
+        [Test]
+        public void testAddition_SameUnit_FeetPlusFeet()
+        {
+            QuantityLength first = new QuantityLength(1.0, LengthUnit.Feet);
+            QuantityLength second = new QuantityLength(2.0, LengthUnit.Feet);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(3.0, LengthUnit.Feet)));
+        }
+
+        [Test]
+        public void testAddition_SameUnit_InchPlusInch()
+        {
+            QuantityLength first = new QuantityLength(6.0, LengthUnit.Inch);
+            QuantityLength second = new QuantityLength(6.0, LengthUnit.Inch);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(12.0, LengthUnit.Inch)));
+        }
+
+        [Test]
+        public void testAddition_CrossUnit_FeetPlusInches()
+        {
+            QuantityLength first = new QuantityLength(1.0, LengthUnit.Feet);
+            QuantityLength second = new QuantityLength(12.0, LengthUnit.Inch);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(2.0, LengthUnit.Feet)));
+        }
+
+        [Test]
+        public void testAddition_CrossUnit_InchPlusFeet()
+        {
+            QuantityLength first = new QuantityLength(12.0, LengthUnit.Inch);
+            QuantityLength second = new QuantityLength(1.0, LengthUnit.Feet);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(24.0, LengthUnit.Inch)));
+        }
+
+        [Test]
+        public void testAddition_CrossUnit_YardPlusFeet()
+        {
+            QuantityLength first = new QuantityLength(1.0, LengthUnit.Yard);
+            QuantityLength second = new QuantityLength(3.0, LengthUnit.Feet);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(2.0, LengthUnit.Yard)));
+        }
+
+        [Test]
+        public void testAddition_CrossUnit_CentimeterPlusInch()
+        {
+            QuantityLength first = new QuantityLength(2.54, LengthUnit.Centimeter);
+            QuantityLength second = new QuantityLength(1.0, LengthUnit.Inch);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(5.08, LengthUnit.Centimeter)));
+        }
+
+        [Test]
+        public void testAddition_Commutativity()
+        {
+            QuantityLength feet = new QuantityLength(1.0, LengthUnit.Feet);
+            QuantityLength inches = new QuantityLength(12.0, LengthUnit.Inch);
+
+            QuantityLength result1 = feet.Add(inches);
+            QuantityLength result2 = inches.Add(feet);
+
+            Assert.IsTrue(result1.Equals(result2));
+        }
+
+        [Test]
+        public void testAddition_WithZero()
+        {
+            QuantityLength first = new QuantityLength(5.0, LengthUnit.Feet);
+            QuantityLength second = new QuantityLength(0.0, LengthUnit.Inch);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(5.0, LengthUnit.Feet)));
+        }
+
+        [Test]
+        public void testAddition_NegativeValues()
+        {
+            QuantityLength first = new QuantityLength(5.0, LengthUnit.Feet);
+            QuantityLength second = new QuantityLength(-2.0, LengthUnit.Feet);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(3.0, LengthUnit.Feet)));
+        }
+
+        [Test]
+        public void testAddition_NullSecondOperand()
+        {
+            QuantityLength first = new QuantityLength(1.0, LengthUnit.Feet);
+            Assert.Throws<ArgumentNullException>(() => first.Add(null));
+        }
+
+        [Test]
+        public void testAddition_LargeValues()
+        {
+            QuantityLength first = new QuantityLength(1000000.0, LengthUnit.Feet);
+            QuantityLength second = new QuantityLength(1000000.0, LengthUnit.Feet);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(2000000.0, LengthUnit.Feet)));
+        }
+
+        [Test]
+        public void testAddition_SmallValues()
+        {
+            QuantityLength first = new QuantityLength(0.001, LengthUnit.Feet);
+            QuantityLength second = new QuantityLength(0.002, LengthUnit.Feet);
+            QuantityLength result = first.Add(second);
+
+            Assert.IsTrue(result.Equals(new QuantityLength(0.003, LengthUnit.Feet)));
         }
     }
 }

@@ -1,4 +1,3 @@
-
 namespace QuantityMeasurementApp.Core
 {
     public enum LengthUnit

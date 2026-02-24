@@ -25,6 +25,12 @@ namespace QuantityMeasurementApp.App
             demonstrateLengthEquality(q1, q2);
 
             demonstrateLengthComparison(2.0, LengthUnit.Inch, 5.0, LengthUnit.Centimeter);
+
+            Console.WriteLine();
+
+            demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.Feet), new QuantityLength(2.0, LengthUnit.Feet));
+            demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.Feet), new QuantityLength(12.0, LengthUnit.Inch));
+            demonstrateLengthAddition(new QuantityLength(12.0, LengthUnit.Inch), new QuantityLength(1.0, LengthUnit.Feet));
         }
 
         public static void demonstrateLengthConversion(double value, LengthUnit source, LengthUnit target)
@@ -50,6 +56,12 @@ namespace QuantityMeasurementApp.App
             QuantityLength q1 = new QuantityLength(v1, u1);
             QuantityLength q2 = new QuantityLength(v2, u2);
             demonstrateLengthEquality(q1, q2);
+        }
+
+        public static void demonstrateLengthAddition(QuantityLength length1, QuantityLength length2)
+        {
+            QuantityLength result = length1.Add(length2);
+            Console.WriteLine($"Added: {length1} + {length2} = {result}");
         }
     }
 }
