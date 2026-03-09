@@ -9,33 +9,25 @@ namespace QuantityMeasurementApp.App
         {
             Console.WriteLine("--- Quantity Measurement App Demo ---\n");
 
+            QuantityWeight weight1 = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            QuantityWeight weight2 = new QuantityWeight(1000.0, WeightUnit.Gram);
+            Console.WriteLine($"Equality: Quantity(1.0, KILOGRAM).equals(Quantity(1000.0, GRAM)) -> Output: {weight1.Equals(weight2)}");
+
+            QuantityWeight weight3 = new QuantityWeight(2.0, WeightUnit.Pound);
+            Console.WriteLine($"Conversion: Quantity(2.0, POUND).convertTo(KILOGRAM) -> Output: Quantity({weight3.ConvertTo(WeightUnit.Kilogram)}, KILOGRAM)");
+
+            QuantityWeight weight4 = new QuantityWeight(1.0, WeightUnit.Kilogram);
+            QuantityWeight weight5 = new QuantityWeight(2.0, WeightUnit.Kilogram);
+            QuantityWeight resultAdd1 = weight4.Add(weight5);
+            Console.WriteLine($"Implicit Add: Quantity(1.0, KILOGRAM).add(Quantity(2.0, KILOGRAM)) -> Output: Quantity({resultAdd1})");
+
+            QuantityWeight weight6 = new QuantityWeight(1.0, WeightUnit.Pound);
+            QuantityWeight weight7 = new QuantityWeight(453.592, WeightUnit.Gram);
+            QuantityWeight resultAdd2 = weight6.Add(weight7, WeightUnit.Pound);
+            Console.WriteLine($"Explicit Add: Quantity(1.0, POUND).add(Quantity(453.592, GRAM), POUND) -> Output: Quantity({resultAdd2})");
+
             QuantityLength length1 = new QuantityLength(1.0, LengthUnit.Feet);
-            QuantityLength length2 = new QuantityLength(12.0, LengthUnit.Inch);
-
-            Console.WriteLine($"Input: Quantity(1.0, FEET).convertTo(INCHES) -> Output: Quantity({length1.ConvertTo(LengthUnit.Inch)}, INCHES)");
-            
-            QuantityLength resultFeet = length1.Add(length2, LengthUnit.Feet);
-            Console.WriteLine($"Input: Quantity(1.0, FEET).add(Quantity(12.0, INCHES), FEET) -> Output: Quantity({resultFeet})");
-
-            QuantityLength length3 = new QuantityLength(36.0, LengthUnit.Inch);
-            QuantityLength length4 = new QuantityLength(1.0, LengthUnit.Yard);
-            Console.WriteLine($"Input: Quantity(36.0, INCHES).equals(Quantity(1.0, YARDS)) -> Output: {length3.Equals(length4)}");
-
-            QuantityLength length5 = new QuantityLength(1.0, LengthUnit.Yard);
-            QuantityLength length6 = new QuantityLength(3.0, LengthUnit.Feet);
-            QuantityLength resultYards = length5.Add(length6, LengthUnit.Yard);
-            Console.WriteLine($"Input: Quantity(1.0, YARDS).add(Quantity(3.0, FEET), YARDS) -> Output: Quantity({resultYards})");
-
-            QuantityLength length7 = new QuantityLength(2.54, LengthUnit.Centimeter);
-            Console.WriteLine($"Input: Quantity(2.54, CENTIMETERS).convertTo(INCHES) -> Output: Quantity({length7.ConvertTo(LengthUnit.Inch)}, INCHES)");
-
-            QuantityLength length8 = new QuantityLength(5.0, LengthUnit.Feet);
-            QuantityLength length9 = new QuantityLength(0.0, LengthUnit.Inch);
-            QuantityLength resultAddZero = length8.Add(length9, LengthUnit.Feet);
-            Console.WriteLine($"Input: Quantity(5.0, FEET).add(Quantity(0.0, INCHES), FEET) -> Output: Quantity({resultAddZero})");
-
-            Console.WriteLine($"Input: LengthUnit.FEET.convertToBaseUnit(12.0) -> Output: {LengthUnit.Feet.ConvertToBaseUnit(12.0)}");
-            Console.WriteLine($"Input: LengthUnit.INCHES.convertToBaseUnit(12.0) -> Output: {LengthUnit.Inch.ConvertToBaseUnit(12.0)}");
+            Console.WriteLine($"Category Incompatibility: Quantity(1.0, KILOGRAM).equals(Quantity(1.0, FEET)) -> Output: {weight1.Equals(length1)}");
         }
     }
 }
