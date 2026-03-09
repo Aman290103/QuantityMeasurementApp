@@ -9,25 +9,36 @@ namespace QuantityMeasurementApp.App
         {
             Console.WriteLine("--- Quantity Measurement App Demo ---\n");
 
-            QuantityWeight weight1 = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight weight2 = new QuantityWeight(1000.0, WeightUnit.Gram);
-            Console.WriteLine($"Equality: Quantity(1.0, KILOGRAM).equals(Quantity(1000.0, GRAM)) -> Output: {weight1.Equals(weight2)}");
+            // Length Operations
+            Quantity<LengthUnit> length1 = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            Quantity<LengthUnit> length2 = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
+            DemonstrateEquality(length1, length2);
 
-            QuantityWeight weight3 = new QuantityWeight(2.0, WeightUnit.Pound);
-            Console.WriteLine($"Conversion: Quantity(2.0, POUND).convertTo(KILOGRAM) -> Output: Quantity({weight3.ConvertTo(WeightUnit.Kilogram)}, KILOGRAM)");
+            Quantity<LengthUnit> lengthConverted = new Quantity<LengthUnit>(length1.ConvertTo(LengthUnit.Inch), LengthUnit.Inch);
+            Console.WriteLine($"Converted: Quantity(1.0, FEET).convertTo(INCHES) -> Output: {lengthConverted}");
 
-            QuantityWeight weight4 = new QuantityWeight(1.0, WeightUnit.Kilogram);
-            QuantityWeight weight5 = new QuantityWeight(2.0, WeightUnit.Kilogram);
-            QuantityWeight resultAdd1 = weight4.Add(weight5);
-            Console.WriteLine($"Implicit Add: Quantity(1.0, KILOGRAM).add(Quantity(2.0, KILOGRAM)) -> Output: Quantity({resultAdd1})");
+            Quantity<LengthUnit> lengthAdded = length1.Add(length2, LengthUnit.Feet);
+            Console.WriteLine($"Added: Quantity(1.0, FEET).add(Quantity(12.0, INCHES), FEET) -> Output: {lengthAdded}\n");
 
-            QuantityWeight weight6 = new QuantityWeight(1.0, WeightUnit.Pound);
-            QuantityWeight weight7 = new QuantityWeight(453.592, WeightUnit.Gram);
-            QuantityWeight resultAdd2 = weight6.Add(weight7, WeightUnit.Pound);
-            Console.WriteLine($"Explicit Add: Quantity(1.0, POUND).add(Quantity(453.592, GRAM), POUND) -> Output: Quantity({resultAdd2})");
+            // Weight Operations
+            Quantity<WeightUnit> weight1 = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> weight2 = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
+            DemonstrateEquality(weight1, weight2);
 
-            QuantityLength length1 = new QuantityLength(1.0, LengthUnit.Feet);
-            Console.WriteLine($"Category Incompatibility: Quantity(1.0, KILOGRAM).equals(Quantity(1.0, FEET)) -> Output: {weight1.Equals(length1)}");
+            Quantity<WeightUnit> weightConverted = new Quantity<WeightUnit>(weight1.ConvertTo(WeightUnit.Gram), WeightUnit.Gram);
+            Console.WriteLine($"Converted: Quantity(1.0, KILOGRAM).convertTo(GRAM) -> Output: {weightConverted}");
+
+            Quantity<WeightUnit> weightAdded = weight1.Add(weight2, WeightUnit.Kilogram);
+            Console.WriteLine($"Added: Quantity(1.0, KILOGRAM).add(Quantity(1000.0, GRAM), KILOGRAM) -> Output: {weightAdded}\n");
+
+            // Cross Category compile-time safety check (uncommenting the line below causes a compiler error)
+            // Console.WriteLine(length1.Equals(weight1));
+        }
+
+        // Generic Demonstration Method
+        public static void DemonstrateEquality<T>(Quantity<T> q1, Quantity<T> q2) where T : IMeasurable
+        {
+            Console.WriteLine($"Equality: {q1} equals {q2} -> Output: {q1.Equals(q2)}");
         }
     }
 }

@@ -1,43 +1,39 @@
 namespace QuantityMeasurementApp.Core
 {
-    public enum LengthUnit
+    // Represents different length units and their conversion to base unit (Feet)
+    public class LengthUnit : IMeasurable
     {
-        Feet,
-        Inch,
-        Yard,
-        Centimeter
-    }
+        // Predefined length units
+        public static readonly LengthUnit Feet = new LengthUnit("Feet", 1.0);
+        public static readonly LengthUnit Inch = new LengthUnit("Inch", 1.0 / 12.0);
+        public static readonly LengthUnit Yard = new LengthUnit("Yard", 3.0);
+        public static readonly LengthUnit Centimeter = new LengthUnit("Centimeter", 1.0 / 30.48);
 
-    public static class LengthUnitExtensions
-    {
-        public static double GetConversionFactor(this LengthUnit unit)
+        private readonly string name;
+        private readonly double conversionFactor;
+
+        // Private constructor to restrict external creation
+        private LengthUnit(string name, double conversionFactor)
         {
-            switch (unit)
-            {
-                case LengthUnit.Feet:
-                    return 1.0;
-                case LengthUnit.Inch:
-                    return 1.0 / 12.0;
-                case LengthUnit.Yard:
-                    return 3.0;
-                case LengthUnit.Centimeter:
-                    return 1.0 / 30.48;
-                default:
-                    return 1.0;
-            }
+            this.name = name;
+            this.conversionFactor = conversionFactor;
         }
 
-        public static double ConvertToBaseUnit(this LengthUnit unit, double value)
+        // Returns conversion factor to base unit
+        public double GetConversionFactor() => conversionFactor;
+
+        // Converts given value to base unit (Feet)
+        public double ConvertToBaseUnit(double value) => value * conversionFactor;
+
+        // Converts base unit value back to this unit
+        public double ConvertFromBaseUnit(double baseValue)
         {
-            return value * unit.GetConversionFactor();
+            if (conversionFactor == 0) return 0;
+            return baseValue / conversionFactor;
         }
 
-        public static double ConvertFromBaseUnit(this LengthUnit unit, double baseValue)
-        {
-            double factor = unit.GetConversionFactor();
-            if (factor == 0) return 0;
-            
-            return baseValue / factor;
-        }
+        public string GetUnitName() => name;
+
+        public override string ToString() => name;
     }
 }
