@@ -2,13 +2,13 @@ using System;
 
 namespace QuantityMeasurementApp.Core
 {
-    // Generic class to represent measurable quantities (Length, Weight, etc.)
+    // Generic measurable quantity (Length, Weight, etc.)
     public class Quantity<T> where T : IMeasurable
     {
-        private readonly double value;
-        private readonly T unit;
+        private readonly double value; // numeric value
+        private readonly T unit;       // unit of measurement
 
-        // Constructor with basic validation
+        // Constructor with validation
         public Quantity(double value, T unit)
         {
             if (unit == null)
@@ -33,41 +33,89 @@ namespace QuantityMeasurementApp.Core
             return Math.Round(convertedValue, 5);
         }
 
-        // Internal logic for addition
-        private Quantity<T> AddInternal(Quantity<T> other, T targetUnit)
+        // Centralized arithmetic operations
+        public enum ArithmeticOperation
+        {
+            Add,
+            Subtract,
+            Divide
+        }
+
+        // Common validation for arithmetic methods
+        private void ValidateArithmeticOperands(Quantity<T> other, T targetUnit, bool targetUnitRequired)
         {
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
 
-            if (targetUnit == null)
+            if (targetUnitRequired && targetUnit == null)
                 throw new ArgumentNullException(nameof(targetUnit));
+        }
 
+        // Performs arithmetic in base unit
+        private double PerformBaseArithmetic(Quantity<T> other, ArithmeticOperation operation)
+        {
             double thisBase = this.unit.ConvertToBaseUnit(this.value);
             double otherBase = other.unit.ConvertToBaseUnit(other.value);
 
-            double sumBase = thisBase + otherBase;
-            double sumTarget = targetUnit.ConvertFromBaseUnit(sumBase);
+            switch (operation)
+            {
+                case ArithmeticOperation.Add:
+                    return thisBase + otherBase;
 
-            return new Quantity<T>(Math.Round(sumTarget, 5), targetUnit);
+                case ArithmeticOperation.Subtract:
+                    return thisBase - otherBase;
+
+                case ArithmeticOperation.Divide:
+                    if (Math.Abs(otherBase) < 1e-10)
+                        throw new DivideByZeroException("Cannot divide by zero quantity.");
+                    return thisBase / otherBase;
+
+                default:
+                    throw new InvalidOperationException("Unsupported operation.");
+            }
         }
 
-        // Add and return result in current unit
+        // -------- Public Arithmetic API --------
+
         public Quantity<T> Add(Quantity<T> other)
-        {
-            return AddInternal(other, this.unit);
-        }
+            => Add(other, this.unit);
 
-        // Add and return result in specified unit
         public Quantity<T> Add(Quantity<T> other, T targetUnit)
         {
-            return AddInternal(other, targetUnit);
+            ValidateArithmeticOperands(other, targetUnit, true);
+
+            double resultBase = PerformBaseArithmetic(other, ArithmeticOperation.Add);
+            double resultTarget = targetUnit.ConvertFromBaseUnit(resultBase);
+
+            return new Quantity<T>(Math.Round(resultTarget, 5), targetUnit);
         }
 
-        // Checks equality by comparing base unit values
+        public Quantity<T> Subtract(Quantity<T> other)
+            => Subtract(other, this.unit);
+
+        public Quantity<T> Subtract(Quantity<T> other, T targetUnit)
+        {
+            ValidateArithmeticOperands(other, targetUnit, true);
+
+            double resultBase = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
+            double resultTarget = targetUnit.ConvertFromBaseUnit(resultBase);
+
+            return new Quantity<T>(Math.Round(resultTarget, 5), targetUnit);
+        }
+
+        // Returns dimensionless result
+        public double Divide(Quantity<T> other)
+        {
+            ValidateArithmeticOperands(other, default(T)!, false);
+            return PerformBaseArithmetic(other, ArithmeticOperation.Divide);
+        }
+
+        // -------- Overrides --------
+
+        // Equality based on base unit comparison
         public override bool Equals(object? obj)
         {
             if (this == obj) return true;
-
             if (obj == null || obj.GetType() != typeof(Quantity<T>))
                 return false;
 
@@ -80,49 +128,9 @@ namespace QuantityMeasurementApp.Core
         }
 
         public override int GetHashCode()
-        {
-            return value.GetHashCode() ^ unit.GetHashCode();
-        }
+            => value.GetHashCode() ^ unit.GetHashCode();
 
         public override string ToString()
-        {
-            return $"{value} {unit.GetUnitName()}";
-        }
-
-
-        //Internal logic for subtraction
-        private Quantity<T> SubtractInternal(Quantity<T> other, T targetUnit)
-        {
-            if (other == null) throw new ArgumentNullException(nameof(other));
-            if (targetUnit == null) throw new ArgumentNullException(nameof(targetUnit));
-
-            double thisBase = this.unit.ConvertToBaseUnit(this.value);
-            double otherBase = other.unit.ConvertToBaseUnit(other.value);
-
-            double diffBase = thisBase - otherBase;
-            double diffTarget = targetUnit.ConvertFromBaseUnit(diffBase);
-
-            return new Quantity<T>(Math.Round(diffTarget, 5), targetUnit);
-        }
-
-        //Method to call subtraction
-        public Quantity<T> Subtract(Quantity<T> other) => SubtractInternal(other, this.unit);
-        public Quantity<T> Subtract(Quantity<T> other, T targetUnit) => SubtractInternal(other, targetUnit);
-
-        // logic and method for dividing
-        public double Divide(Quantity<T> other)
-        {
-            if (other == null) throw new ArgumentNullException(nameof(other));
-
-            double thisBase = this.unit.ConvertToBaseUnit(this.value);
-            double otherBase = other.unit.ConvertToBaseUnit(other.value);
-
-            if (Math.Abs(otherBase) < 1e-10)
-            {
-                throw new DivideByZeroException("Cannot divide by a quantity of zero.");
-            }
-
-            return thisBase / otherBase;
-        }
+            => $"{value} {unit.GetUnitName()}";
     }
 }

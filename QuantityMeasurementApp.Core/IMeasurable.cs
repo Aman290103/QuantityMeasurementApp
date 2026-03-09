@@ -1,4 +1,3 @@
-
 namespace QuantityMeasurementApp.Core
 {
     // Interface for measurement units

@@ -768,5 +768,70 @@ namespace QuantityMeasurementApp.Tests
             Quantity<LengthUnit> result = a.Add(b).Subtract(b);
             Assert.IsTrue(a.Equals(result));
         }
+
+        // --- UC13 Centralized DRY Arithmetic Tests ---
+
+        [Test]
+        public void testValidation_NullOperand_ConsistentAcrossOperations()
+        {
+            Quantity<LengthUnit> quantity = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
+
+            Assert.Throws<ArgumentNullException>(() => quantity.Add(null!));
+            Assert.Throws<ArgumentNullException>(() => quantity.Subtract(null!));
+            Assert.Throws<ArgumentNullException>(() => quantity.Divide(null!));
+        }
+
+        [Test]
+        public void testValidation_NullTargetUnit_AddSubtractReject()
+        {
+            Quantity<LengthUnit> quantity = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
+            Quantity<LengthUnit> other = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+
+            Assert.Throws<ArgumentNullException>(() => quantity.Add(other, null!));
+            Assert.Throws<ArgumentNullException>(() => quantity.Subtract(other, null!));
+        }
+
+        [Test]
+        public void testArithmeticOperation_Add_EnumComputation()
+        {
+            Quantity<LengthUnit> q1 = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
+            Quantity<LengthUnit> q2 = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            Assert.IsTrue(q1.Add(q2).Equals(new Quantity<LengthUnit>(15.0, LengthUnit.Feet)));
+        }
+
+        [Test]
+        public void testArithmeticOperation_Subtract_EnumComputation()
+        {
+            Quantity<LengthUnit> q1 = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
+            Quantity<LengthUnit> q2 = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            Assert.IsTrue(q1.Subtract(q2).Equals(new Quantity<LengthUnit>(5.0, LengthUnit.Feet)));
+        }
+
+        [Test]
+        public void testArithmeticOperation_Divide_EnumComputation()
+        {
+            Quantity<LengthUnit> q1 = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
+            Quantity<LengthUnit> q2 = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            Assert.AreEqual(2.0, q1.Divide(q2), 0.0001);
+        }
+
+        [Test]
+        public void testArithmeticOperation_DivideByZero_EnumThrows()
+        {
+            Quantity<LengthUnit> q1 = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
+            Quantity<LengthUnit> zero = new Quantity<LengthUnit>(0.0, LengthUnit.Feet);
+            Assert.Throws<DivideByZeroException>(() => q1.Divide(zero));
+        }
+
+        [Test]
+        public void testRefactoring_NoBehaviorChange_LargeDataset()
+        {
+            Quantity<VolumeUnit> vol1 = new Quantity<VolumeUnit>(5.0, VolumeUnit.Litre);
+            Quantity<VolumeUnit> vol2 = new Quantity<VolumeUnit>(500.0, VolumeUnit.Millilitre);
+
+            Assert.IsTrue(vol1.Add(vol2).Equals(new Quantity<VolumeUnit>(5.5, VolumeUnit.Litre)));
+            Assert.IsTrue(vol1.Subtract(vol2).Equals(new Quantity<VolumeUnit>(4.5, VolumeUnit.Litre)));
+            Assert.AreEqual(10.0, vol1.Divide(vol2), 0.0001);
+        }
     }
 }
