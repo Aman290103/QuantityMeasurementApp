@@ -516,5 +516,80 @@ namespace QuantityMeasurementApp.Tests
 
             Assert.IsTrue(result.Equals(new QuantityLength(0.66667, LengthUnit.Yard)));
         }
+
+        [Test]
+        public void testLengthUnitEnum_FeetConstant()
+        {
+            Assert.AreEqual(1.0, LengthUnit.Feet.GetConversionFactor());
+        }
+
+        [Test]
+        public void testLengthUnitEnum_InchesConstant()
+        {
+            Assert.AreEqual(1.0 / 12.0, LengthUnit.Inch.GetConversionFactor(), 0.0001);
+        }
+
+        [Test]
+        public void testLengthUnitEnum_YardsConstant()
+        {
+            Assert.AreEqual(3.0, LengthUnit.Yard.GetConversionFactor());
+        }
+
+        [Test]
+        public void testLengthUnitEnum_CentimetersConstant()
+        {
+            Assert.AreEqual(1.0 / 30.48, LengthUnit.Centimeter.GetConversionFactor(), 0.0001);
+        }
+
+        [Test]
+        public void testConvertToBaseUnit_FeetToFeet()
+        {
+            Assert.AreEqual(5.0, LengthUnit.Feet.ConvertToBaseUnit(5.0));
+        }
+
+        [Test]
+        public void testConvertToBaseUnit_InchesToFeet()
+        {
+            Assert.AreEqual(1.0, LengthUnit.Inch.ConvertToBaseUnit(12.0));
+        }
+
+        [Test]
+        public void testConvertToBaseUnit_YardsToFeet()
+        {
+            Assert.AreEqual(3.0, LengthUnit.Yard.ConvertToBaseUnit(1.0));
+        }
+
+        [Test]
+        public void testConvertToBaseUnit_CentimetersToFeet()
+        {
+            Assert.AreEqual(1.0, LengthUnit.Centimeter.ConvertToBaseUnit(30.48), 0.0001);
+        }
+
+        [Test]
+        public void testConvertFromBaseUnit_FeetToFeet()
+        {
+            Assert.AreEqual(2.0, LengthUnit.Feet.ConvertFromBaseUnit(2.0));
+        }
+
+        [Test]
+        public void testConvertFromBaseUnit_FeetToInches()
+        {
+            Assert.AreEqual(12.0, LengthUnit.Inch.ConvertFromBaseUnit(1.0));
+        }
+
+        [Test]
+        public void testConvertFromBaseUnit_FeetToYards()
+        {
+            Assert.AreEqual(1.0, LengthUnit.Yard.ConvertFromBaseUnit(3.0));
+        }
+
+        [Test]
+        public void testConvertFromBaseUnit_FeetToCentimeters()
+        {
+            Assert.AreEqual(30.48, LengthUnit.Centimeter.ConvertFromBaseUnit(1.0), 0.0001);
+        }
+
+
+        
     }
 }

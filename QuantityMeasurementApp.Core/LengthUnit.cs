@@ -10,72 +10,34 @@ namespace QuantityMeasurementApp.Core
 
     public static class LengthUnitExtensions
     {
-        /// <summary>
-        /// Returns the value converted to the base unit (Inches).
-        /// </summary>
-        public static double GetBaseValue(this LengthUnit unit, double value)
+        public static double GetConversionFactor(this LengthUnit unit)
         {
             switch (unit)
             {
                 case LengthUnit.Feet:
-                    return value * 12.0;
-                case LengthUnit.Yard:
-                    return value * 36.0;
-                case LengthUnit.Centimeter:
-                    return value * 0.393701;
+                    return 1.0;
                 case LengthUnit.Inch:
-                    return value * 1.0;
+                    return 1.0 / 12.0;
+                case LengthUnit.Yard:
+                    return 3.0;
+                case LengthUnit.Centimeter:
+                    return 1.0 / 30.48;
                 default:
-                    return value;
+                    return 1.0;
             }
         }
 
-        /// <summary>
-        /// Gets the conversion factor relative to the base unit (Inches).
-        /// </summary>
-        public static double GetConversionFactor(this LengthUnit unit)
+        public static double ConvertToBaseUnit(this LengthUnit unit, double value)
         {
-            return unit.GetBaseValue(1.0);
-        }
-    }
-}namespace QuantityMeasurementApp.Core
-{
-    public enum LengthUnit
-    {
-        Feet,
-        Inch,
-        Yard,
-        Centimeter
-    }
-
-    public static class LengthUnitExtensions
-    {
-        /// <summary>
-        /// Returns the value converted to the base unit (Inches).
-        /// </summary>
-        public static double GetBaseValue(this LengthUnit unit, double value)
-        {
-            switch (unit)
-            {
-                case LengthUnit.Feet:
-                    return value * 12.0;
-                case LengthUnit.Yard:
-                    return value * 36.0;
-                case LengthUnit.Centimeter:
-                    return value * 0.393701;
-                case LengthUnit.Inch:
-                    return value * 1.0;
-                default:
-                    return value;
-            }
+            return value * unit.GetConversionFactor();
         }
 
-        /// <summary>
-        /// Gets the conversion factor relative to the base unit (Inches).
-        /// </summary>
-        public static double GetConversionFactor(this LengthUnit unit)
+        public static double ConvertFromBaseUnit(this LengthUnit unit, double baseValue)
         {
-            return unit.GetBaseValue(1.0);
+            double factor = unit.GetConversionFactor();
+            if (factor == 0) return 0;
+            
+            return baseValue / factor;
         }
     }
 }

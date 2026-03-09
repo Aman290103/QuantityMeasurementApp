@@ -30,8 +30,8 @@ namespace QuantityMeasurementApp.Core
 
             QuantityLength other = (QuantityLength)obj;
 
-            double thisBaseValue = this.unit.GetBaseValue(this.value);
-            double otherBaseValue = other.unit.GetBaseValue(other.value);
+            double thisBaseValue = Math.Round(this.unit.ConvertToBaseUnit(this.value), 5);
+            double otherBaseValue = Math.Round(other.unit.ConvertToBaseUnit(other.value), 5);
 
             return thisBaseValue.CompareTo(otherBaseValue) == 0;
         }
@@ -48,25 +48,15 @@ namespace QuantityMeasurementApp.Core
         /// </summary>
         public double ConvertTo(LengthUnit targetUnit)
         {
-            // 1. Validate Input
             if (!double.IsFinite(this.value))
             {
                 throw new ArgumentException("Value must be a finite number.");
             }
 
-            // 2. Convert to Base Unit (Inches)
-            double baseValue = this.unit.GetBaseValue(this.value);
+            double baseValue = this.unit.ConvertToBaseUnit(this.value);
+            double convertedValue = targetUnit.ConvertFromBaseUnit(baseValue);
 
-            // 3. Convert from Base Unit to Target Unit
-            double targetFactor = targetUnit.GetConversionFactor();
-
-            // Avoid division by zero if factor is 0 (unlikely for length, but good practice)
-            if (targetFactor == 0) return 0;
-
-            double convertedValue = baseValue / targetFactor;
-
-            // 4. Return result (rounding can be handled by caller or here if strict equality needed)
-            return Math.Round(convertedValue, 5);
+            return Math.Round(convertedValue, 5); 
         }
 
 
@@ -84,15 +74,15 @@ namespace QuantityMeasurementApp.Core
                 throw new ArgumentNullException(nameof(other));
             }
 
-            double thisBase = this.unit.GetBaseValue(this.value);
-            double otherBase = other.unit.GetBaseValue(other.value);
+            double thisBase = this.unit.ConvertToBaseUnit(this.value);
+            double otherBase = other.unit.ConvertToBaseUnit(other.value);
             
             double sumBase = thisBase + otherBase;
-            double targetFactor = targetUnit.GetConversionFactor();
+            double sumTarget = targetUnit.ConvertFromBaseUnit(sumBase);
             
-            double sumTarget = targetFactor == 0 ? 0 : sumBase / targetFactor;
-
             return new QuantityLength(Math.Round(sumTarget, 5), targetUnit);
+
+            
         }
 
         public QuantityLength Add(QuantityLength other)
