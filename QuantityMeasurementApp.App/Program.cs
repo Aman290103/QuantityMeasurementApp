@@ -9,48 +9,33 @@ namespace QuantityMeasurementApp.App
         {
             Console.WriteLine("--- Quantity Measurement App Demo ---\n");
 
-            // Length Operations
+            // --- Addition ---
             Quantity<LengthUnit> length1 = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
             Quantity<LengthUnit> length2 = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
-            DemonstrateEquality(length1, length2);
+            Console.WriteLine($"Added: Quantity(1.0, FEET).add(Quantity(12.0, INCHES), FEET) -> Output: {length1.Add(length2, LengthUnit.Feet)}\n");
 
-            Quantity<LengthUnit> lengthConverted = new Quantity<LengthUnit>(length1.ConvertTo(LengthUnit.Inch), LengthUnit.Inch);
-            Console.WriteLine($"Converted: Quantity(1.0, FEET).convertTo(INCHES) -> Output: {lengthConverted}");
+            // --- Subtraction ---
+            Console.WriteLine("--- Subtraction Demonstrations ---");
+            Quantity<LengthUnit> length3 = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
+            Quantity<LengthUnit> length4 = new Quantity<LengthUnit>(6.0, LengthUnit.Inch);
+            Console.WriteLine($"Subtract (Implicit): {length3} - {length4} -> {length3.Subtract(length4)}");
+            Console.WriteLine($"Subtract (Explicit): {length3} - {length4} -> {length3.Subtract(length4, LengthUnit.Inch)}");
 
-            Quantity<LengthUnit> lengthAdded = length1.Add(length2, LengthUnit.Feet);
-            Console.WriteLine($"Added: Quantity(1.0, FEET).add(Quantity(12.0, INCHES), FEET) -> Output: {lengthAdded}\n");
+            Quantity<VolumeUnit> vol1 = new Quantity<VolumeUnit>(5.0, VolumeUnit.Litre);
+            Quantity<VolumeUnit> vol2 = new Quantity<VolumeUnit>(500.0, VolumeUnit.Millilitre);
+            Console.WriteLine($"Subtract Volume: {vol1} - {vol2} -> {vol1.Subtract(vol2)}");
 
-            // Weight Operations
-            Quantity<WeightUnit> weight1 = new Quantity<WeightUnit>(1.0, WeightUnit.Kilogram);
-            Quantity<WeightUnit> weight2 = new Quantity<WeightUnit>(1000.0, WeightUnit.Gram);
-            DemonstrateEquality(weight1, weight2);
+            Quantity<WeightUnit> weight1 = new Quantity<WeightUnit>(2.0, WeightUnit.Kilogram);
+            Quantity<WeightUnit> weight2 = new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram);
+            Console.WriteLine($"Subtract (Negative Result): {weight1} - {weight2} -> {weight1.Subtract(weight2)}\n");
 
-            Quantity<WeightUnit> weightConverted = new Quantity<WeightUnit>(weight1.ConvertTo(WeightUnit.Gram), WeightUnit.Gram);
-            Console.WriteLine($"Converted: Quantity(1.0, KILOGRAM).convertTo(GRAM) -> Output: {weightConverted}");
-
-            Quantity<WeightUnit> weightAdded = weight1.Add(weight2, WeightUnit.Kilogram);
-            Console.WriteLine($"Added: Quantity(1.0, KILOGRAM).add(Quantity(1000.0, GRAM), KILOGRAM) -> Output: {weightAdded}\n");
-
-            // Volume Operations
-            Quantity<VolumeUnit> volume1 = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
-            Quantity<VolumeUnit> volume2 = new Quantity<VolumeUnit>(1000.0, VolumeUnit.Millilitre);
-            DemonstrateEquality(volume1, volume2);
-
-            Quantity<VolumeUnit> volumeConverted = new Quantity<VolumeUnit>(volume1.ConvertTo(VolumeUnit.Gallon), VolumeUnit.Gallon);
-            Console.WriteLine($"Converted: Quantity(1.0, LITRE).convertTo(GALLON) -> Output: {volumeConverted}");
-
-            Quantity<VolumeUnit> volumeAdded = volume1.Add(volume2, VolumeUnit.Litre);
-            Console.WriteLine($"Added: Quantity(1.0, LITRE).add(Quantity(1000.0, MILLILITRE), LITRE) -> Output: {volumeAdded}\n");
-
-            // Cross Category compile-time safety check (uncommenting the lines below causes a compiler error)
-            // Console.WriteLine(length1.Equals(weight1));
-            // Console.WriteLine(volume1.Equals(length1));
-        }
-
-        // Generic Demonstration Method
-        public static void DemonstrateEquality<T>(Quantity<T> q1, Quantity<T> q2) where T : IMeasurable
-        {
-            Console.WriteLine($"Equality: {q1} equals {q2} -> Output: {q1.Equals(q2)}");
+            // --- Division ---
+            Console.WriteLine("--- Division Demonstrations ---");
+            Console.WriteLine($"Divide (Same Unit): {new Quantity<LengthUnit>(10.0, LengthUnit.Feet)} / {new Quantity<LengthUnit>(2.0, LengthUnit.Feet)} -> {new Quantity<LengthUnit>(10.0, LengthUnit.Feet).Divide(new Quantity<LengthUnit>(2.0, LengthUnit.Feet))}");
+            Console.WriteLine($"Divide (Ratio < 1): {new Quantity<LengthUnit>(5.0, LengthUnit.Feet)} / {new Quantity<LengthUnit>(10.0, LengthUnit.Feet)} -> {new Quantity<LengthUnit>(5.0, LengthUnit.Feet).Divide(new Quantity<LengthUnit>(10.0, LengthUnit.Feet))}");
+            Console.WriteLine($"Divide (Cross Unit): {new Quantity<LengthUnit>(24.0, LengthUnit.Inch)} / {new Quantity<LengthUnit>(2.0, LengthUnit.Feet)} -> {new Quantity<LengthUnit>(24.0, LengthUnit.Inch).Divide(new Quantity<LengthUnit>(2.0, LengthUnit.Feet))}");
+            Console.WriteLine($"Divide (Weight): {new Quantity<WeightUnit>(10.0, WeightUnit.Kilogram)} / {new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram)} -> {new Quantity<WeightUnit>(10.0, WeightUnit.Kilogram).Divide(new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram))}");
+            Console.WriteLine();
         }
     }
 }

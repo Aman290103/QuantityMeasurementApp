@@ -88,5 +88,41 @@ namespace QuantityMeasurementApp.Core
         {
             return $"{value} {unit.GetUnitName()}";
         }
+
+
+        //Internal logic for subtraction
+        private Quantity<T> SubtractInternal(Quantity<T> other, T targetUnit)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+            if (targetUnit == null) throw new ArgumentNullException(nameof(targetUnit));
+
+            double thisBase = this.unit.ConvertToBaseUnit(this.value);
+            double otherBase = other.unit.ConvertToBaseUnit(other.value);
+
+            double diffBase = thisBase - otherBase;
+            double diffTarget = targetUnit.ConvertFromBaseUnit(diffBase);
+
+            return new Quantity<T>(Math.Round(diffTarget, 5), targetUnit);
+        }
+
+        //Method to call subtraction
+        public Quantity<T> Subtract(Quantity<T> other) => SubtractInternal(other, this.unit);
+        public Quantity<T> Subtract(Quantity<T> other, T targetUnit) => SubtractInternal(other, targetUnit);
+
+        // logic and method for dividing
+        public double Divide(Quantity<T> other)
+        {
+            if (other == null) throw new ArgumentNullException(nameof(other));
+
+            double thisBase = this.unit.ConvertToBaseUnit(this.value);
+            double otherBase = other.unit.ConvertToBaseUnit(other.value);
+
+            if (Math.Abs(otherBase) < 1e-10)
+            {
+                throw new DivideByZeroException("Cannot divide by a quantity of zero.");
+            }
+
+            return thisBase / otherBase;
+        }
     }
 }
