@@ -833,5 +833,127 @@ namespace QuantityMeasurementApp.Tests
             Assert.IsTrue(vol1.Subtract(vol2).Equals(new Quantity<VolumeUnit>(4.5, VolumeUnit.Litre)));
             Assert.AreEqual(10.0, vol1.Divide(vol2), 0.0001);
         }
+
+
+        // --- UC14 Temperature Category & Operational Constraints Tests ---
+
+        [Test]
+        public void testTemperatureEquality_CelsiusToCelsius_SameValue()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(0.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(0.0, TemperatureUnit.Celsius);
+            Assert.IsTrue(first.Equals(second));
+        }
+
+        [Test]
+        public void testTemperatureEquality_FahrenheitToFahrenheit_SameValue()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(32.0, TemperatureUnit.Fahrenheit);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(32.0, TemperatureUnit.Fahrenheit);
+            Assert.IsTrue(first.Equals(second));
+        }
+
+        [Test]
+        public void testTemperatureEquality_CelsiusToFahrenheit_0Celsius32Fahrenheit()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(0.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(32.0, TemperatureUnit.Fahrenheit);
+            Assert.IsTrue(first.Equals(second));
+        }
+
+        [Test]
+        public void testTemperatureEquality_CelsiusToFahrenheit_100Celsius212Fahrenheit()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(212.0, TemperatureUnit.Fahrenheit);
+            Assert.IsTrue(first.Equals(second));
+        }
+
+        [Test]
+        public void testTemperatureEquality_CelsiusToFahrenheit_Negative40Equal()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(-40.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(-40.0, TemperatureUnit.Fahrenheit);
+            Assert.IsTrue(first.Equals(second));
+        }
+
+        [Test]
+        public void testTemperatureEquality_CelsiusToKelvin_0Celsius273Kelvin()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(0.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(273.15, TemperatureUnit.Kelvin);
+            Assert.IsTrue(first.Equals(second));
+        }
+
+        [Test]
+        public void testTemperatureConversion_CelsiusToFahrenheit_VariousValues()
+        {
+            Quantity<TemperatureUnit> q1 = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius);
+            Assert.AreEqual(122.0, q1.ConvertTo(TemperatureUnit.Fahrenheit), 0.0001);
+
+            Quantity<TemperatureUnit> q2 = new Quantity<TemperatureUnit>(-20.0, TemperatureUnit.Celsius);
+            Assert.AreEqual(-4.0, q2.ConvertTo(TemperatureUnit.Fahrenheit), 0.0001);
+        }
+
+        [Test]
+        public void testTemperatureConversion_FahrenheitToCelsius_VariousValues()
+        {
+            Quantity<TemperatureUnit> q1 = new Quantity<TemperatureUnit>(122.0, TemperatureUnit.Fahrenheit);
+            Assert.AreEqual(50.0, q1.ConvertTo(TemperatureUnit.Celsius), 0.0001);
+        }
+
+        [Test]
+        public void testTemperatureConversion_RoundTrip_PreservesValue()
+        {
+            Quantity<TemperatureUnit> start = new Quantity<TemperatureUnit>(37.5, TemperatureUnit.Celsius);
+            double fahrenheit = start.ConvertTo(TemperatureUnit.Fahrenheit);
+            Quantity<TemperatureUnit> mid = new Quantity<TemperatureUnit>(fahrenheit, TemperatureUnit.Fahrenheit);
+            
+            Assert.AreEqual(37.5, mid.ConvertTo(TemperatureUnit.Celsius), 0.0001);
+        }
+
+        [Test]
+        public void testTemperatureUnsupportedOperation_Add()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius);
+            
+            var ex = Assert.Throws<NotSupportedException>(() => first.Add(second));
+            Assert.IsTrue(ex!.Message.Contains("does not support Add operations"));
+        }
+
+        [Test]
+        public void testTemperatureUnsupportedOperation_Subtract()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius);
+            
+            Assert.Throws<NotSupportedException>(() => first.Subtract(second));
+        }
+
+        [Test]
+        public void testTemperatureUnsupportedOperation_Divide()
+        {
+            Quantity<TemperatureUnit> first = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> second = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius);
+            
+            Assert.Throws<NotSupportedException>(() => first.Divide(second));
+        }
+
+        [Test]
+        public void testTemperatureVsLengthIncompatibility()
+        {
+            Quantity<TemperatureUnit> temp = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
+            Quantity<LengthUnit> length = new Quantity<LengthUnit>(100.0, LengthUnit.Feet);
+            Assert.IsFalse(temp.Equals(length));
+        }
+
+        [Test]
+        public void testOperationSupportMethods_TemperatureUnitAddition()
+        {
+            Assert.IsFalse(TemperatureUnit.Celsius.SupportsArithmetic());
+        }
+
+        
     }
 }

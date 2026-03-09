@@ -54,6 +54,9 @@ namespace QuantityMeasurementApp.Core
         // Performs arithmetic in base unit
         private double PerformBaseArithmetic(Quantity<T> other, ArithmeticOperation operation)
         {
+            // UC14: Validate if the unit supports this arithmetic operation
+            this.unit.ValidateOperationSupport(operation.ToString());
+
             double thisBase = this.unit.ConvertToBaseUnit(this.value);
             double otherBase = other.unit.ConvertToBaseUnit(other.value);
 
@@ -61,17 +64,16 @@ namespace QuantityMeasurementApp.Core
             {
                 case ArithmeticOperation.Add:
                     return thisBase + otherBase;
-
                 case ArithmeticOperation.Subtract:
                     return thisBase - otherBase;
-
                 case ArithmeticOperation.Divide:
                     if (Math.Abs(otherBase) < 1e-10)
-                        throw new DivideByZeroException("Cannot divide by zero quantity.");
+                    {
+                        throw new DivideByZeroException("Cannot divide by a quantity of zero.");
+                    }
                     return thisBase / otherBase;
-
                 default:
-                    throw new InvalidOperationException("Unsupported operation.");
+                    throw new InvalidOperationException("Unsupported arithmetic operation.");
             }
         }
 

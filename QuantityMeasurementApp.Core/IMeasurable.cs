@@ -14,5 +14,14 @@ namespace QuantityMeasurementApp.Core
 
         // Returns unit name
         string GetUnitName();
+
+        // UC14: Optional Operation Support (Default interface methods)
+        bool SupportsArithmetic() => true;
+
+        void ValidateOperationSupport(string operation)
+        {
+            // Default implementation allows operations. 
+            // Subclasses can override to throw exceptions for unsupported operations.
+        }
     }
 }

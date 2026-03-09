@@ -9,33 +9,34 @@ namespace QuantityMeasurementApp.App
         {
             Console.WriteLine("--- Quantity Measurement App Demo ---\n");
 
-            // --- Addition ---
-            Quantity<LengthUnit> length1 = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
-            Quantity<LengthUnit> length2 = new Quantity<LengthUnit>(12.0, LengthUnit.Inch);
-            Console.WriteLine($"Added: Quantity(1.0, FEET).add(Quantity(12.0, INCHES), FEET) -> Output: {length1.Add(length2, LengthUnit.Feet)}\n");
+            // ... [Keep existing Length, Weight, Volume demos] ...
 
-            // --- Subtraction ---
-            Console.WriteLine("--- Subtraction Demonstrations ---");
-            Quantity<LengthUnit> length3 = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
-            Quantity<LengthUnit> length4 = new Quantity<LengthUnit>(6.0, LengthUnit.Inch);
-            Console.WriteLine($"Subtract (Implicit): {length3} - {length4} -> {length3.Subtract(length4)}");
-            Console.WriteLine($"Subtract (Explicit): {length3} - {length4} -> {length3.Subtract(length4, LengthUnit.Inch)}");
+            // --- Temperature Operations ---
+            Console.WriteLine("--- Temperature Demonstrations ---");
+            Quantity<TemperatureUnit> temp1 = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
+            Quantity<TemperatureUnit> temp2 = new Quantity<TemperatureUnit>(212.0, TemperatureUnit.Fahrenheit);
+            DemonstrateEquality(temp1, temp2);
 
-            Quantity<VolumeUnit> vol1 = new Quantity<VolumeUnit>(5.0, VolumeUnit.Litre);
-            Quantity<VolumeUnit> vol2 = new Quantity<VolumeUnit>(500.0, VolumeUnit.Millilitre);
-            Console.WriteLine($"Subtract Volume: {vol1} - {vol2} -> {vol1.Subtract(vol2)}");
+            Quantity<TemperatureUnit> tempConverted = new Quantity<TemperatureUnit>(temp1.ConvertTo(TemperatureUnit.Kelvin), TemperatureUnit.Kelvin);
+            Console.WriteLine($"Converted: Quantity(100.0, CELSIUS).convertTo(KELVIN) -> Output: {tempConverted}");
 
-            Quantity<WeightUnit> weight1 = new Quantity<WeightUnit>(2.0, WeightUnit.Kilogram);
-            Quantity<WeightUnit> weight2 = new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram);
-            Console.WriteLine($"Subtract (Negative Result): {weight1} - {weight2} -> {weight1.Subtract(weight2)}\n");
-
-            // --- Division ---
-            Console.WriteLine("--- Division Demonstrations ---");
-            Console.WriteLine($"Divide (Same Unit): {new Quantity<LengthUnit>(10.0, LengthUnit.Feet)} / {new Quantity<LengthUnit>(2.0, LengthUnit.Feet)} -> {new Quantity<LengthUnit>(10.0, LengthUnit.Feet).Divide(new Quantity<LengthUnit>(2.0, LengthUnit.Feet))}");
-            Console.WriteLine($"Divide (Ratio < 1): {new Quantity<LengthUnit>(5.0, LengthUnit.Feet)} / {new Quantity<LengthUnit>(10.0, LengthUnit.Feet)} -> {new Quantity<LengthUnit>(5.0, LengthUnit.Feet).Divide(new Quantity<LengthUnit>(10.0, LengthUnit.Feet))}");
-            Console.WriteLine($"Divide (Cross Unit): {new Quantity<LengthUnit>(24.0, LengthUnit.Inch)} / {new Quantity<LengthUnit>(2.0, LengthUnit.Feet)} -> {new Quantity<LengthUnit>(24.0, LengthUnit.Inch).Divide(new Quantity<LengthUnit>(2.0, LengthUnit.Feet))}");
-            Console.WriteLine($"Divide (Weight): {new Quantity<WeightUnit>(10.0, WeightUnit.Kilogram)} / {new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram)} -> {new Quantity<WeightUnit>(10.0, WeightUnit.Kilogram).Divide(new Quantity<WeightUnit>(5.0, WeightUnit.Kilogram))}");
+            Console.WriteLine("Attempting unsupported addition (100 Celsius + 50 Celsius):");
+            try
+            {
+                Quantity<TemperatureUnit> temp3 = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius);
+                temp1.Add(temp3);
+            }
+            catch (NotSupportedException ex)
+            {
+                Console.WriteLine($"Error Caught: {ex.Message}");
+            }
+            
             Console.WriteLine();
+        }
+
+        public static void DemonstrateEquality<T>(Quantity<T> q1, Quantity<T> q2) where T : IMeasurable
+        {
+            Console.WriteLine($"Equality: {q1} equals {q2} -> Output: {q1.Equals(q2)}");
         }
     }
 }
