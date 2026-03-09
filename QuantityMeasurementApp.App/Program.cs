@@ -31,8 +31,20 @@ namespace QuantityMeasurementApp.App
             Quantity<WeightUnit> weightAdded = weight1.Add(weight2, WeightUnit.Kilogram);
             Console.WriteLine($"Added: Quantity(1.0, KILOGRAM).add(Quantity(1000.0, GRAM), KILOGRAM) -> Output: {weightAdded}\n");
 
-            // Cross Category compile-time safety check (uncommenting the line below causes a compiler error)
+            // Volume Operations
+            Quantity<VolumeUnit> volume1 = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
+            Quantity<VolumeUnit> volume2 = new Quantity<VolumeUnit>(1000.0, VolumeUnit.Millilitre);
+            DemonstrateEquality(volume1, volume2);
+
+            Quantity<VolumeUnit> volumeConverted = new Quantity<VolumeUnit>(volume1.ConvertTo(VolumeUnit.Gallon), VolumeUnit.Gallon);
+            Console.WriteLine($"Converted: Quantity(1.0, LITRE).convertTo(GALLON) -> Output: {volumeConverted}");
+
+            Quantity<VolumeUnit> volumeAdded = volume1.Add(volume2, VolumeUnit.Litre);
+            Console.WriteLine($"Added: Quantity(1.0, LITRE).add(Quantity(1000.0, MILLILITRE), LITRE) -> Output: {volumeAdded}\n");
+
+            // Cross Category compile-time safety check (uncommenting the lines below causes a compiler error)
             // Console.WriteLine(length1.Equals(weight1));
+            // Console.WriteLine(volume1.Equals(length1));
         }
 
         // Generic Demonstration Method
