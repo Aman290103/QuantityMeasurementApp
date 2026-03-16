@@ -1,5 +1,9 @@
-﻿﻿using System;
-using QuantityMeasurementApp.Core;
+using System;
+using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Repository;
+using QuantityMeasurementApp.Service;
+using QuantityMeasurementApp.Controllers;
+using System.Linq;
 
 namespace QuantityMeasurementApp.App
 {
@@ -7,36 +11,57 @@ namespace QuantityMeasurementApp.App
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("--- Quantity Measurement App Demo ---\n");
+            Console.WriteLine("--- Quantity Measurement App Demo (N-Tier Architecture) ---\n");
 
-            // ... [Keep existing Length, Weight, Volume demos] ...
+            // Setup Dependencies
+            IQuantityMeasurementRepository repository = QuantityMeasurementCacheRepository.Instance;
+            IQuantityMeasurementService service = new QuantityMeasurementServiceImpl(repository);
+            QuantityMeasurementController controller = new QuantityMeasurementController(service);
+
+            // --- Length Operations ---
+            Console.WriteLine("--- Length Demonstrations ---");
+            controller.PerformComparison(
+                new QuantityDTO(1.0, "Feet", "Length"), 
+                new QuantityDTO(12.0, "Inch", "Length"));
+
+            controller.PerformConversion(
+                new QuantityDTO(1.0, "Feet", "Length"), "Inch");
+
+            controller.PerformAddition(
+                 new QuantityDTO(1.0, "Feet", "Length"),
+                 new QuantityDTO(2.0, "Inch", "Length"), "Inch");
+
+            // --- Volume Operations ---
+            Console.WriteLine("\n--- Volume Demonstrations ---");
+            controller.PerformComparison(
+                new QuantityDTO(1.0, "Gallon", "Volume"), 
+                new QuantityDTO(3.78541, "Litre", "Volume"));
+
+            controller.PerformAddition(
+                 new QuantityDTO(1.0, "Gallon", "Volume"),
+                 new QuantityDTO(1.0, "Litre", "Volume"), "Litre");
 
             // --- Temperature Operations ---
-            Console.WriteLine("--- Temperature Demonstrations ---");
-            Quantity<TemperatureUnit> temp1 = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.Celsius);
-            Quantity<TemperatureUnit> temp2 = new Quantity<TemperatureUnit>(212.0, TemperatureUnit.Fahrenheit);
-            DemonstrateEquality(temp1, temp2);
+            Console.WriteLine("\n--- Temperature Demonstrations ---");
+            controller.PerformComparison(
+                new QuantityDTO(100.0, "Celsius", "Temperature"), 
+                new QuantityDTO(212.0, "Fahrenheit", "Temperature"));
 
-            Quantity<TemperatureUnit> tempConverted = new Quantity<TemperatureUnit>(temp1.ConvertTo(TemperatureUnit.Kelvin), TemperatureUnit.Kelvin);
-            Console.WriteLine($"Converted: Quantity(100.0, CELSIUS).convertTo(KELVIN) -> Output: {tempConverted}");
+            controller.PerformConversion(
+                new QuantityDTO(100.0, "Celsius", "Temperature"), "Kelvin");
 
             Console.WriteLine("Attempting unsupported addition (100 Celsius + 50 Celsius):");
-            try
-            {
-                Quantity<TemperatureUnit> temp3 = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.Celsius);
-                temp1.Add(temp3);
-            }
-            catch (NotSupportedException ex)
-            {
-                Console.WriteLine($"Error Caught: {ex.Message}");
-            }
-            
-            Console.WriteLine();
-        }
+            controller.PerformAddition(
+                new QuantityDTO(100.0, "Celsius", "Temperature"),
+                new QuantityDTO(50.0, "Celsius", "Temperature"), "Celsius");
 
-        public static void DemonstrateEquality<T>(Quantity<T> q1, Quantity<T> q2) where T : IMeasurable
-        {
-            Console.WriteLine($"Equality: {q1} equals {q2} -> Output: {q1.Equals(q2)}");
+            var measurements = repository.GetAllMeasurements();
+            Console.WriteLine($"\nStored entity count in Cache: {measurements.Count()}");
+            foreach(var item in measurements)
+            {
+                Console.WriteLine(item.ToString());
+            }
+            Console.WriteLine();
         }
     }
 }

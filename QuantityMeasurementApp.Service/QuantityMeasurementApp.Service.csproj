@@ -1,7 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -11,8 +10,6 @@
     <ProjectReference Include="..\QuantityMeasurementApp.Core\QuantityMeasurementApp.Core.csproj" />
     <ProjectReference Include="..\QuantityMeasurementApp.Models\QuantityMeasurementApp.Models.csproj" />
     <ProjectReference Include="..\QuantityMeasurementApp.Repository\QuantityMeasurementApp.Repository.csproj" />
-    <ProjectReference Include="..\QuantityMeasurementApp.Service\QuantityMeasurementApp.Service.csproj" />
-    <ProjectReference Include="..\QuantityMeasurementApp.Controllers\QuantityMeasurementApp.Controllers.csproj" />
   </ItemGroup>
 
 </Project>
