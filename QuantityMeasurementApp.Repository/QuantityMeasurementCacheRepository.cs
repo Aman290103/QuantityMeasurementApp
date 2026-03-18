@@ -39,5 +39,25 @@ namespace QuantityMeasurementApp.Repository
         {
             return cache;
         }
+
+        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType)
+        {
+            return cache.FindAll(e => e.OperationType.Equals(operationType, System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        public IEnumerable<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType)
+        {
+            return cache.FindAll(e => e.MeasurementType.Equals(measurementType, System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        public int GetTotalCount()
+        {
+            return cache.Count;
+        }
+
+        public void DeleteAll()
+        {
+            cache.Clear();
+        }
     }
 }

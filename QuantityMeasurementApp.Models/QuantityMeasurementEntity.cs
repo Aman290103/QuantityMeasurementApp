@@ -6,6 +6,7 @@ namespace QuantityMeasurementApp.Models
     public class QuantityMeasurementEntity
     {
         public string OperationType { get; }
+        public string MeasurementType { get; }
         
         public double Operand1Value { get; }
         public string Operand1Unit { get; }
@@ -20,7 +21,7 @@ namespace QuantityMeasurementApp.Models
 
         public QuantityMeasurementEntity(string operationType, double op1Val, string op1Unit, 
             double? op2Val, string? op2Unit, double? resVal, string? resUnit, 
-            bool hasError = false, string? errorMsg = null)
+            bool hasError = false, string? errorMsg = null, string measurementType = "N/A")
         {
             OperationType = operationType;
             Operand1Value = op1Val;
@@ -31,6 +32,7 @@ namespace QuantityMeasurementApp.Models
             ResultUnit = resUnit;
             HasError = hasError;
             ErrorMessage = errorMsg;
+            MeasurementType = measurementType;
         }
 
         // Single operand success constructor

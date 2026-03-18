@@ -7,5 +7,10 @@ namespace QuantityMeasurementApp.Repository
     {
         void SaveMeasurement(QuantityMeasurementEntity entity);
         IEnumerable<QuantityMeasurementEntity> GetAllMeasurements();
+        
+        IEnumerable<QuantityMeasurementEntity> GetMeasurementsByOperation(string operationType);
+        IEnumerable<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType);
+        int GetTotalCount();
+        void DeleteAll();
     }
 }
