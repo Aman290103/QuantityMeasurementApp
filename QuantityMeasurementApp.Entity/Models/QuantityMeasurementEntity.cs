@@ -1,6 +1,6 @@
 using System;
 
-namespace QuantityMeasurementApp.Models
+namespace QuantityMeasurementApp.Entity
 {
     [Serializable]
     public class QuantityMeasurementEntity

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace QuantityMeasurementApp.Core
+namespace QuantityMeasurementApp.Entity
 {
     // Utility to map string unit names to IMeasurable objects
     public static class UnitMapper
@@ -17,7 +17,7 @@ namespace QuantityMeasurementApp.Core
                 "LENGTH" => GetFromStaticFields<LengthUnit>(unitName),
                 "VOLUME" => GetFromStaticFields<VolumeUnit>(unitName),
                 "WEIGHT" => GetFromStaticFields<WeightUnit>(unitName),
-                "TEMPERATURE" => GetFromStaticFields<TemperatureUnit>(unitName),
+                "TEMPERATURE" => GetFromStaticFields<Temperature>(unitName),
                 _ => throw new ArgumentException($"Invalid Measurement Type: {type}")
             };
         }

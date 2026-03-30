@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuantityMeasurementApp.Controllers;
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Controller;
+using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.App
 {
@@ -116,7 +116,7 @@ namespace QuantityMeasurementApp.App
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("╔══════════════════════════════════════════════╗");
-            Console.WriteLine("║      Quantity Measurement App  v1.0          ║");
+            Console.WriteLine("║           Quantity Measurement App           ║");
             Console.WriteLine("╚══════════════════════════════════════════════╝");
             Console.ResetColor();
             Console.WriteLine();

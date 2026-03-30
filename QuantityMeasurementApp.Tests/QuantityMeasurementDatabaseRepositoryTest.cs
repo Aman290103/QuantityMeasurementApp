@@ -1,6 +1,6 @@
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Entity;
 using QuantityMeasurementApp.Repository;
 using System;
 using System.Linq;

@@ -1,6 +1,6 @@
 using System;
 
-namespace QuantityMeasurementApp.Core
+namespace QuantityMeasurementApp.Service
 {
     public class QuantityMeasurementException : Exception
     {

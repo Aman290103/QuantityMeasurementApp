@@ -1,4 +1,4 @@
-namespace QuantityMeasurementApp.Models
+namespace QuantityMeasurementApp.Entity
 {
     public class QuantityDTO
     {

@@ -1,21 +1,21 @@
 using System;
 
-namespace QuantityMeasurementApp.Core
+namespace QuantityMeasurementApp.Entity
 {
-    public class TemperatureUnit : IMeasurable
+    public class Temperature : IMeasurable
     {
         // Base Unit: Celsius
-        public static readonly TemperatureUnit Celsius = new TemperatureUnit(
+        public static readonly Temperature Celsius = new Temperature(
             "Celsius", 
             c => c, 
             c => c);
             
-        public static readonly TemperatureUnit Fahrenheit = new TemperatureUnit(
+        public static readonly Temperature Fahrenheit = new Temperature(
             "Fahrenheit", 
             f => (f - 32.0) * 5.0 / 9.0, 
             c => (c * 9.0 / 5.0) + 32.0);
             
-        public static readonly TemperatureUnit Kelvin = new TemperatureUnit(
+        public static readonly Temperature Kelvin = new Temperature(
             "Kelvin", 
             k => k - 273.15, 
             c => c + 273.15);
@@ -24,7 +24,7 @@ namespace QuantityMeasurementApp.Core
         private readonly Func<double, double> toBase;
         private readonly Func<double, double> fromBase;
 
-        private TemperatureUnit(string name, Func<double, double> toBase, Func<double, double> fromBase)
+        private Temperature(string name, Func<double, double> toBase, Func<double, double> fromBase)
         {
             this.name = name;
             this.toBase = toBase;

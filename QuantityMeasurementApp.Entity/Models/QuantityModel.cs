@@ -1,15 +1,15 @@
 using System;
 
-namespace QuantityMeasurementApp.Core
+namespace QuantityMeasurementApp.Entity
 {
     // Generic measurable quantity (Length, Weight, etc.)
-    public class Quantity<T> where T : IMeasurable
+    public class QuantityModel<U> where U : IMeasurable
     {
-        private readonly double value; // numeric value
-        private readonly T unit;       // unit of measurement
+        public double Value { get; }
+        public U Unit { get; }
 
         // Constructor with validation
-        public Quantity(double value, T unit)
+        public QuantityModel(double value, U unit)
         {
             if (unit == null)
                 throw new ArgumentNullException(nameof(unit), "Unit cannot be null");
@@ -17,17 +17,17 @@ namespace QuantityMeasurementApp.Core
             if (!double.IsFinite(value))
                 throw new ArgumentException("Value must be a finite number.");
 
-            this.value = value;
-            this.unit = unit;
+            this.Value = value;
+            this.Unit = unit;
         }
 
         // Convert quantity to target unit
-        public double ConvertTo(T targetUnit)
+        public double ConvertTo(U targetUnit)
         {
             if (targetUnit == null)
                 throw new ArgumentNullException(nameof(targetUnit));
 
-            double baseValue = this.unit.ConvertToBaseUnit(this.value);
+            double baseValue = this.Unit.ConvertToBaseUnit(this.Value);
             double convertedValue = targetUnit.ConvertFromBaseUnit(baseValue);
 
             return Math.Round(convertedValue, 5);
@@ -42,7 +42,7 @@ namespace QuantityMeasurementApp.Core
         }
 
         // Common validation for arithmetic methods
-        private void ValidateArithmeticOperands(Quantity<T> other, T targetUnit, bool targetUnitRequired)
+        private void ValidateArithmeticOperands(QuantityModel<U> other, U targetUnit, bool targetUnitRequired)
         {
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
@@ -52,13 +52,13 @@ namespace QuantityMeasurementApp.Core
         }
 
         // Performs arithmetic in base unit
-        private double PerformBaseArithmetic(Quantity<T> other, ArithmeticOperation operation)
+        private double PerformBaseArithmetic(QuantityModel<U> other, ArithmeticOperation operation)
         {
             // UC14: Validate if the unit supports this arithmetic operation
-            this.unit.ValidateOperationSupport(operation.ToString());
+            this.Unit.ValidateOperationSupport(operation.ToString());
 
-            double thisBase = this.unit.ConvertToBaseUnit(this.value);
-            double otherBase = other.unit.ConvertToBaseUnit(other.value);
+            double thisBase = this.Unit.ConvertToBaseUnit(this.Value);
+            double otherBase = other.Unit.ConvertToBaseUnit(other.Value);
 
             switch (operation)
             {
@@ -79,36 +79,36 @@ namespace QuantityMeasurementApp.Core
 
         // -------- Public Arithmetic API --------
 
-        public Quantity<T> Add(Quantity<T> other)
-            => Add(other, this.unit);
+        public QuantityModel<U> Add(QuantityModel<U> other)
+            => Add(other, this.Unit);
 
-        public Quantity<T> Add(Quantity<T> other, T targetUnit)
+        public QuantityModel<U> Add(QuantityModel<U> other, U targetUnit)
         {
             ValidateArithmeticOperands(other, targetUnit, true);
 
             double resultBase = PerformBaseArithmetic(other, ArithmeticOperation.Add);
             double resultTarget = targetUnit.ConvertFromBaseUnit(resultBase);
 
-            return new Quantity<T>(Math.Round(resultTarget, 5), targetUnit);
+            return new QuantityModel<U>(Math.Round(resultTarget, 5), targetUnit);
         }
 
-        public Quantity<T> Subtract(Quantity<T> other)
-            => Subtract(other, this.unit);
+        public QuantityModel<U> Subtract(QuantityModel<U> other)
+            => Subtract(other, this.Unit);
 
-        public Quantity<T> Subtract(Quantity<T> other, T targetUnit)
+        public QuantityModel<U> Subtract(QuantityModel<U> other, U targetUnit)
         {
             ValidateArithmeticOperands(other, targetUnit, true);
 
             double resultBase = PerformBaseArithmetic(other, ArithmeticOperation.Subtract);
             double resultTarget = targetUnit.ConvertFromBaseUnit(resultBase);
 
-            return new Quantity<T>(Math.Round(resultTarget, 5), targetUnit);
+            return new QuantityModel<U>(Math.Round(resultTarget, 5), targetUnit);
         }
 
         // Returns dimensionless result
-        public double Divide(Quantity<T> other)
+        public double Divide(QuantityModel<U> other)
         {
-            ValidateArithmeticOperands(other, default(T)!, false);
+            ValidateArithmeticOperands(other, default(U)!, false);
             return PerformBaseArithmetic(other, ArithmeticOperation.Divide);
         }
 
@@ -118,21 +118,21 @@ namespace QuantityMeasurementApp.Core
         public override bool Equals(object? obj)
         {
             if (this == obj) return true;
-            if (obj == null || obj.GetType() != typeof(Quantity<T>))
+            if (obj == null || obj.GetType() != typeof(QuantityModel<U>))
                 return false;
 
-            Quantity<T> other = (Quantity<T>)obj;
+            QuantityModel<U> other = (QuantityModel<U>)obj;
 
-            double thisBaseValue = Math.Round(this.unit.ConvertToBaseUnit(this.value), 5);
-            double otherBaseValue = Math.Round(other.unit.ConvertToBaseUnit(other.value), 5);
+            double thisBaseValue = Math.Round(this.Unit.ConvertToBaseUnit(this.Value), 5);
+            double otherBaseValue = Math.Round(other.Unit.ConvertToBaseUnit(other.Value), 5);
 
             return thisBaseValue.CompareTo(otherBaseValue) == 0;
         }
 
         public override int GetHashCode()
-            => value.GetHashCode() ^ unit.GetHashCode();
+            => Value.GetHashCode() ^ Unit.GetHashCode();
 
         public override string ToString()
-            => $"{value} {unit.GetUnitName()}";
+            => $"{Value} {Unit.GetUnitName()}";
     }
 }

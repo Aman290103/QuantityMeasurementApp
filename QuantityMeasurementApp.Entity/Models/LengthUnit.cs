@@ -1,4 +1,4 @@
-namespace QuantityMeasurementApp.Core
+namespace QuantityMeasurementApp.Entity
 {
     // Represents different length units and their conversion to base unit (Feet)
     public class LengthUnit : IMeasurable

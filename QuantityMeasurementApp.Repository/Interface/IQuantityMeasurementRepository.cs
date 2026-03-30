@@ -1,4 +1,4 @@
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Entity;
 using System.Collections.Generic;
 
 namespace QuantityMeasurementApp.Repository

@@ -1,4 +1,4 @@
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.Service
 {

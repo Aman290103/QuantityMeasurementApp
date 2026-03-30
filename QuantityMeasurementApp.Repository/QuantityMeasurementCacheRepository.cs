@@ -1,9 +1,7 @@
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Entity;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-// Pragma needed for BinaryFormatter inside .NET Core/5+ but the problem says Net10.0 and BinaryFormatter is obsolete
-// I will not implement actual Disk saving for now, or just dummy it, as its mock/cache.
 
 namespace QuantityMeasurementApp.Repository
 {

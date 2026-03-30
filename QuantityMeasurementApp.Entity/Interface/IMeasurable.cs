@@ -1,4 +1,4 @@
-namespace QuantityMeasurementApp.Core
+namespace QuantityMeasurementApp.Entity
 {
     // Interface for measurement units
     public interface IMeasurable

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.Repository
 {
@@ -139,15 +139,11 @@ namespace QuantityMeasurementApp.Repository
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    // Since the database stores the combined strings "10 Feet", we need to parse them back roughly,
-                    // or construct an entity directly if it is just for display.
-                    // For now, let's load what we can for backward compatibility on display.
                     string opType = reader["OperationType"].ToString() ?? "";
                     bool hasError = Convert.ToBoolean(reader["HasError"]);
                     string errMsg = reader["ErrorMessage"].ToString() ?? "None";
                     string measType = reader["MeasurementType"].ToString() ?? "N/A";
                     
-                    // We parse the first operand safely (ignoring rigorous checks for display) 
                     double op1val = 0; string op1unit = "Unknown";
                     double? op2val = null; string? op2unit = null;
                     double? resval = null; string? resunit = null;

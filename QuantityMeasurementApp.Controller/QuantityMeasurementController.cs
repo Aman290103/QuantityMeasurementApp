@@ -1,8 +1,8 @@
 using System;
-using QuantityMeasurementApp.Models;
+using QuantityMeasurementApp.Entity;
 using QuantityMeasurementApp.Service;
 
-namespace QuantityMeasurementApp.Controllers
+namespace QuantityMeasurementApp.Controller
 {
     public class QuantityMeasurementController
     {

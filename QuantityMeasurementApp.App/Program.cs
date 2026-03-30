@@ -3,7 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using QuantityMeasurementApp.Repository;
 using QuantityMeasurementApp.Service;
-using QuantityMeasurementApp.Controllers;
+using QuantityMeasurementApp.Controller;
 
 namespace QuantityMeasurementApp.App
 {
@@ -35,7 +35,7 @@ namespace QuantityMeasurementApp.App
                 repository = QuantityMeasurementCacheRepository.Instance;
             }
 
-            IQuantityMeasurementService service = new QuantityMeasurementServiceImpl(repository);
+            IQuantityMeasurementService service = new QuantityMeasurementService(repository);
             QuantityMeasurementController controller = new QuantityMeasurementController(service);
 
             // Initialize Menu and Hand Over Control
