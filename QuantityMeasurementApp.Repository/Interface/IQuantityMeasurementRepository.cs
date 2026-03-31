@@ -1,5 +1,5 @@
-using QuantityMeasurementApp.Entity;
 using System.Collections.Generic;
+using QuantityMeasurementApp.Entity;
 
 namespace QuantityMeasurementApp.Repository
 {
@@ -12,5 +12,8 @@ namespace QuantityMeasurementApp.Repository
         IEnumerable<QuantityMeasurementEntity> GetMeasurementsByType(string measurementType);
         int GetTotalCount();
         void DeleteAll();
+
+        IEnumerable<QuantityMeasurementEntity> GetErrorMeasurements();
+        int GetOperationCount(string op);
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using QuantityMeasurementApp.Repository;
 using QuantityMeasurementApp.Service;
 using QuantityMeasurementApp.Controller;
+using Microsoft.EntityFrameworkCore;
 
 namespace QuantityMeasurementApp.App
 {
@@ -23,17 +24,14 @@ namespace QuantityMeasurementApp.App
             // Setup Dependencies (Poor Man's Dependency Injection)
             IQuantityMeasurementRepository repository;
 
-            if (useDatabase)
-            {
-                string connectionString = config.GetConnectionString("SqlServer") ?? "";
-                Console.WriteLine("--- Initializing system with Database Repository ---");
-                repository = new QuantityMeasurementDatabaseRepository(connectionString);
-            }
-            else
-            {
-                Console.WriteLine("--- Initializing system with Local Cache Repository ---");
-                repository = QuantityMeasurementCacheRepository.Instance;
-            }
+            // Simple DB setup for console app using in-memory provider
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase("QuantityMeasurementDB_Console")
+                .Options;
+
+            var dbContext = new AppDbContext(options);
+            repository = new EfCoreQuantityMeasurementRepository(dbContext);
+            Console.WriteLine("--- Initializing system with EF Core In-Memory Repository ---");
 
             IQuantityMeasurementService service = new QuantityMeasurementService(repository);
             QuantityMeasurementController controller = new QuantityMeasurementController(service);

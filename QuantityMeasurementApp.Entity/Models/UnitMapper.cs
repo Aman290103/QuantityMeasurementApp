@@ -12,7 +12,9 @@ namespace QuantityMeasurementApp.Entity
             if (string.IsNullOrWhiteSpace(unitName) || string.IsNullOrWhiteSpace(type))
                 throw new ArgumentException("Unit name or type cannot be empty.");
 
-            return type.ToUpper() switch
+            string typeNormalized = type.ToUpper().Replace("UNIT", "");
+            
+            return typeNormalized switch
             {
                 "LENGTH" => GetFromStaticFields<LengthUnit>(unitName),
                 "VOLUME" => GetFromStaticFields<VolumeUnit>(unitName),
