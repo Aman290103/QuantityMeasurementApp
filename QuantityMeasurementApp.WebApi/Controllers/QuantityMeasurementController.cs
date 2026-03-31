@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuantityMeasurementApp.Entity;
 using QuantityMeasurementApp.Service;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 namespace QuantityMeasurementApp.WebApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/v1/quantities")]
     public class QuantityMeasurementApiController : ControllerBase
     {
