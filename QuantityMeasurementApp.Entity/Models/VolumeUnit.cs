@@ -7,6 +7,9 @@ namespace QuantityMeasurementApp.Entity
         public static readonly VolumeUnit Litre = new VolumeUnit("Litre", 1.0);
         public static readonly VolumeUnit Millilitre = new VolumeUnit("Millilitre", 0.001);
         public static readonly VolumeUnit Gallon = new VolumeUnit("Gallon", 3.78541);
+        public static readonly VolumeUnit Quart = new VolumeUnit("Quart", 3.78541 / 4.0);
+        public static readonly VolumeUnit Pint = new VolumeUnit("Pint", 3.78541 / 8.0);
+        public static readonly VolumeUnit Cup = new VolumeUnit("Cup", 3.78541 / 16.0);
 
         private readonly string name;
         private readonly double conversionFactor;
