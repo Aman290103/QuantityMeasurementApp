@@ -21,18 +21,31 @@ namespace QuantityMeasurementApp.App
             bool useDatabase = false;
             bool.TryParse(config["UseDatabase"], out useDatabase);
 
-            // Setup Dependencies (Poor Man's Dependency Injection)
-            IQuantityMeasurementRepository repository;
+            // Setup Dependencies (Dynamic Provider based on config)
+            var connectionString = config.GetConnectionString("DefaultConnection");
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
-            // Simple DB setup for console app using in-memory provider
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase("QuantityMeasurementDB_Console")
-                .Options;
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                optionsBuilder.UseSqlServer(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
+                Console.WriteLine("--- Initializing system with SQL Server Repository ---");
+            }
+            else
+            {
+                optionsBuilder.UseInMemoryDatabase("QuantityMeasurementDB_Console");
+                Console.WriteLine("--- Initializing system with EF Core In-Memory Repository (Fallback) ---");
+            }
 
-            var dbContext = new AppDbContext(options);
-            repository = new EfCoreQuantityMeasurementRepository(dbContext);
-            Console.WriteLine("--- Initializing system with EF Core In-Memory Repository ---");
+            var dbContext = new AppDbContext(optionsBuilder.Options);
+            
+            // Apply migrations for SQL Server provider if needed
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                dbContext.Database.Migrate();
+                Console.WriteLine("--- Database Migrations Applied Successfully ---\n");
+            }
 
+            var repository = new EfCoreQuantityMeasurementRepository(dbContext);
             IQuantityMeasurementService service = new QuantityMeasurementService(repository);
             QuantityMeasurementController controller = new QuantityMeasurementController(service);
 

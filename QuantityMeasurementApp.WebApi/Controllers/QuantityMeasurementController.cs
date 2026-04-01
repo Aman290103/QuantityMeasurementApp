@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace QuantityMeasurementApp.WebApi.Controllers
 {
     [ApiController]
-    [Authorize]
+    // [Authorize]
     [Route("api/v1/quantities")]
     public class QuantityMeasurementApiController : ControllerBase
     {

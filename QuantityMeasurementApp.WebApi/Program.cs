@@ -92,4 +92,21 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Migrate DataBase
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        Console.WriteLine("\n--- Applying Database Migrations (if any) ---");
+        dbContext.Database.Migrate();
+        Console.WriteLine("--- Database Migrations Applied Successfully ---\n");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"\n--- Error Applying Migrations: {ex.Message} ---\n");
+    }
+}
+
 app.Run();
+
