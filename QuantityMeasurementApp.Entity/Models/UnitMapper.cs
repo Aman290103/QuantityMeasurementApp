@@ -20,6 +20,10 @@ namespace QuantityMeasurementApp.Entity
                 "VOLUME" => GetFromStaticFields<VolumeUnit>(unitName),
                 "WEIGHT" => GetFromStaticFields<WeightUnit>(unitName),
                 "TEMPERATURE" => GetFromStaticFields<Temperature>(unitName),
+                "AREA" => GetFromStaticFields<AreaUnit>(unitName),
+                "ANGLE" => GetFromStaticFields<AngleUnit>(unitName),
+                "SPEED" => GetFromStaticFields<SpeedUnit>(unitName),
+                "TIME" => GetFromStaticFields<TimeUnit>(unitName),
                 _ => throw new ArgumentException($"Invalid Measurement Type: {type}")
             };
         }

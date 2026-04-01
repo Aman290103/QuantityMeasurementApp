@@ -11,7 +11,11 @@ namespace QuantityMeasurementApp.App
             ["Length"] = new string[] { "Feet", "Inch", "Yard", "Centimeter" },
             ["Volume"] = new string[] { "Litre", "Millilitre", "Gallon" },
             ["Weight"] = new string[] { "Kilogram", "Gram", "Pound" },
-            ["Temperature"] = new string[] { "Celsius", "Fahrenheit", "Kelvin" }
+            ["Temperature"] = new string[] { "Celsius", "Fahrenheit", "Kelvin" },
+            ["Area"] = new string[] { "SquareMeter", "SquareFoot", "Acre", "SquareInch" },
+            ["Angle"] = new string[] { "Degree", "Radian", "Gradian" },
+            ["Speed"] = new string[] { "MetersPerSecond", "KilometersPerHour", "MilesPerHour", "Knots" },
+            ["Time"] = new string[] { "Second", "Minute", "Hour", "Day" }
         };
 
         internal static int PickFromMenu(string title, string[] options)
@@ -25,17 +29,16 @@ namespace QuantityMeasurementApp.App
             while (true)
             {
                 Console.Write("Enter choice: ");
-                string input = Console.ReadLine();
-                try
+                string? input = Console.ReadLine();
+                if (int.TryParse(input, out int choice))
                 {
-                    int choice = int.Parse(input);
                     if (choice >= 1 && choice <= options.Length)
                     {
                         return choice;
                     }
                     Console.WriteLine("Invalid choice. Enter a valid number from the menu.");
                 }
-                catch (Exception)
+                else
                 {
                     Console.WriteLine("Invalid input. Please enter a number.");
                 }
@@ -66,16 +69,12 @@ namespace QuantityMeasurementApp.App
             while (true)
             {
                 Console.Write(prompt);
-                string input = Console.ReadLine();
-                try
+                string? input = Console.ReadLine();
+                if (double.TryParse(input, out double value))
                 {
-                    double value = double.Parse(input);
                     return value;
                 }
-                catch (Exception)
-                {
-                    Console.WriteLine("Invalid number.");
-                }
+                Console.WriteLine("Invalid number.");
             }
         }
     }

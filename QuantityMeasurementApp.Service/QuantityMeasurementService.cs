@@ -30,13 +30,13 @@ namespace QuantityMeasurementApp.Service
             try
             {
                 var inputModel = ConvertDtoToModel(input);
-                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, input.MeasurementType);
+                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, input.MeasurementType ?? "N/A");
                 double resultValue = inputModel.ConvertTo(targetUnitObj);
 
                 _repository.SaveMeasurement(new QuantityMeasurementEntity(
-                    "CONVERT", input.Value, input.Unit, resultValue, targetUnit));
+                    "CONVERT", input.Value, input.Unit, null, null, resultValue, targetUnit, false, null, input.MeasurementType ?? "N/A"));
 
-                return new QuantityDTO(resultValue, targetUnit, input.MeasurementType);
+                return new QuantityDTO(resultValue, targetUnit, input.MeasurementType ?? "N/A");
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace QuantityMeasurementApp.Service
         {
             try
             {
-                if (!first.MeasurementType.Equals(second.MeasurementType, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(first.MeasurementType, second.MeasurementType, StringComparison.OrdinalIgnoreCase))
                     throw new QuantityMeasurementException("Measurement categories do not match.");
 
                 var q1 = ConvertDtoToModel(first);
@@ -59,7 +59,7 @@ namespace QuantityMeasurementApp.Service
 
                 _repository.SaveMeasurement(new QuantityMeasurementEntity(
                     "COMPARE", first.Value, first.Unit, second.Value, second.Unit,
-                    result ? 1 : 0, "Boolean"));
+                    result ? 1 : 0, "Boolean", false, null, first.MeasurementType ?? "N/A"));
 
                 return result;
             }
@@ -85,7 +85,7 @@ namespace QuantityMeasurementApp.Service
         {
             try
             {
-                if (!first.MeasurementType.Equals(second.MeasurementType, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(first.MeasurementType, second.MeasurementType, StringComparison.OrdinalIgnoreCase))
                     throw new QuantityMeasurementException("Measurement categories do not match.");
 
                 var q1 = ConvertDtoToModel(first);
@@ -109,12 +109,12 @@ namespace QuantityMeasurementApp.Service
         {
             try
             {
-                if (!first.MeasurementType.Equals(second.MeasurementType, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(first.MeasurementType, second.MeasurementType, StringComparison.OrdinalIgnoreCase))
                     throw new QuantityMeasurementException("Measurement categories do not match.");
 
                 var q1 = ConvertDtoToModel(first);
                 var q2 = ConvertDtoToModel(second);
-                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, first.MeasurementType);
+                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, first.MeasurementType ?? "N/A");
 
                 QuantityModel<IMeasurable> resultQ;
                 if (operation == QuantityModel<IMeasurable>.ArithmeticOperation.Add)
@@ -125,9 +125,9 @@ namespace QuantityMeasurementApp.Service
                 double resultValue = resultQ.ConvertTo(targetUnitObj);
 
                 _repository.SaveMeasurement(new QuantityMeasurementEntity(
-                    opName, first.Value, first.Unit, second.Value, second.Unit, resultValue, targetUnit));
+                    opName, first.Value, first.Unit, second.Value, second.Unit, resultValue, targetUnit, false, null, first.MeasurementType ?? "N/A"));
 
-                return new QuantityDTO(resultValue, targetUnit, first.MeasurementType);
+                return new QuantityDTO(resultValue, targetUnit, first.MeasurementType ?? "N/A");
             }
             catch (Exception ex) when (ex is not QuantityMeasurementException)
             {
@@ -149,7 +149,7 @@ namespace QuantityMeasurementApp.Service
                 if (string.IsNullOrEmpty(q2.MeasurementType))
                     q2.MeasurementType = q1.MeasurementType;
 
-                if (!q1.MeasurementType.Equals(q2.MeasurementType, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(q1.MeasurementType, q2.MeasurementType, StringComparison.OrdinalIgnoreCase))
                     throw new QuantityMeasurementException($"Cannot compare different measurement categories: {q1.MeasurementType} and {q2.MeasurementType}");
 
                 var model1 = ConvertDtoToModel(q1);
@@ -158,7 +158,7 @@ namespace QuantityMeasurementApp.Service
 
                 var entity = new QuantityMeasurementEntity(
                     "COMPARE", q1.Value, q1.Unit, q2.Value, q2.Unit,
-                    result ? 1.0 : 0.0, "Boolean", false, null, q1.MeasurementType);
+                    result ? 1.0 : 0.0, "Boolean", false, null, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
 
                 var dto = QuantityMeasurementDTO.FromEntity(entity);
@@ -171,7 +171,7 @@ namespace QuantityMeasurementApp.Service
                 var q2 = input.ThatQuantityDTO;
                 var entity = new QuantityMeasurementEntity(
                     "COMPARE", q1.Value, q1.Unit, q2?.Value, q2?.Unit,
-                    null, null, true, ex.Message, q1.MeasurementType);
+                    null, null, true, ex.Message, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);
             }
@@ -185,12 +185,12 @@ namespace QuantityMeasurementApp.Service
                 var targetUnit = input.ThatQuantityDTO?.Unit ?? throw new ArgumentException("Target unit missing");
 
                 var inputModel = ConvertDtoToModel(q1);
-                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, q1.MeasurementType);
+                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, q1.MeasurementType ?? "N/A");
                 double resultValue = inputModel.ConvertTo(targetUnitObj);
 
                 var entity = new QuantityMeasurementEntity(
                     "CONVERT", q1.Value, q1.Unit, null, null,
-                    resultValue, targetUnit, false, null, q1.MeasurementType);
+                    resultValue, targetUnit, false, null, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
 
                 return QuantityMeasurementDTO.FromEntity(entity);
@@ -200,7 +200,7 @@ namespace QuantityMeasurementApp.Service
                 var q1 = input.ThisQuantityDTO;
                 var entity = new QuantityMeasurementEntity(
                     "CONVERT", q1.Value, q1.Unit, null, null,
-                    null, null, true, ex.Message, q1.MeasurementType);
+                    null, null, true, ex.Message, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException($"Conversion failed: {ex.Message}", ex);
             }
@@ -226,7 +226,7 @@ namespace QuantityMeasurementApp.Service
                 if (string.IsNullOrEmpty(q2.MeasurementType))
                     q2.MeasurementType = q1.MeasurementType;
 
-                if (!q1.MeasurementType.Equals(q2.MeasurementType, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(q1.MeasurementType, q2.MeasurementType, StringComparison.OrdinalIgnoreCase))
                     throw new QuantityMeasurementException($"Cannot perform arithmetic between different measurement categories: {q1.MeasurementType} and {q2.MeasurementType}");
 
                 var model1 = ConvertDtoToModel(q1);
@@ -235,7 +235,7 @@ namespace QuantityMeasurementApp.Service
 
                 var entity = new QuantityMeasurementEntity(
                     "DIVIDE", q1.Value, q1.Unit, q2.Value, q2.Unit,
-                    result, "Scalar", false, null, q1.MeasurementType);
+                    result, "Scalar", false, null, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
 
                 return QuantityMeasurementDTO.FromEntity(entity);
@@ -246,7 +246,7 @@ namespace QuantityMeasurementApp.Service
                 var q2 = input.ThatQuantityDTO;
                 var entity = new QuantityMeasurementEntity(
                     "DIVIDE", q1.Value, q1.Unit, q2?.Value, q2?.Unit,
-                    null, null, true, ex.Message, q1.MeasurementType);
+                    null, null, true, ex.Message, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);
             }
@@ -263,12 +263,12 @@ namespace QuantityMeasurementApp.Service
                 if (string.IsNullOrEmpty(q2.MeasurementType))
                     q2.MeasurementType = q1.MeasurementType;
 
-                if (!q1.MeasurementType.Equals(q2.MeasurementType, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(q1.MeasurementType, q2.MeasurementType, StringComparison.OrdinalIgnoreCase))
                     throw new QuantityMeasurementException($"Cannot perform arithmetic between different measurement categories: {q1.MeasurementType} and {q2.MeasurementType}");
 
                 var model1 = ConvertDtoToModel(q1);
                 var model2 = ConvertDtoToModel(q2);
-                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, q1.MeasurementType);
+                var targetUnitObj = UnitMapper.GetUnitFromString(targetUnit, q1.MeasurementType ?? "N/A");
 
                 QuantityModel<IMeasurable> resultQ;
                 if (operation == QuantityModel<IMeasurable>.ArithmeticOperation.Add)
@@ -280,7 +280,7 @@ namespace QuantityMeasurementApp.Service
 
                 var entity = new QuantityMeasurementEntity(
                     opName, q1.Value, q1.Unit, q2.Value, q2.Unit,
-                    resultValue, targetUnit, false, null, q1.MeasurementType);
+                    resultValue, targetUnit, false, null, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
 
                 return QuantityMeasurementDTO.FromEntity(entity);
@@ -291,7 +291,7 @@ namespace QuantityMeasurementApp.Service
                 var q2 = input.ThatQuantityDTO;
                 var entity = new QuantityMeasurementEntity(
                     opName, q1.Value, q1.Unit, q2?.Value, q2?.Unit,
-                    null, null, true, ex.Message, q1.MeasurementType);
+                    null, null, true, ex.Message, q1.MeasurementType ?? "N/A");
                 _repository.SaveMeasurement(entity);
                 throw new QuantityMeasurementException(ex.Message, ex);
             }
