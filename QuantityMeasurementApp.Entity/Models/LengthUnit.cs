@@ -8,6 +8,8 @@ namespace QuantityMeasurementApp.Entity
         public static readonly LengthUnit Inch = new LengthUnit("Inch", 1.0 / 12.0);
         public static readonly LengthUnit Yard = new LengthUnit("Yard", 3.0);
         public static readonly LengthUnit Centimeter = new LengthUnit("Centimeter", 1.0 / 30.48);
+        public static readonly LengthUnit Meter = new LengthUnit("Meter", 100.0 / 30.48);
+        public static readonly LengthUnit Kilometer = new LengthUnit("Kilometer", 100000.0 / 30.48);
 
         private readonly string name;
         private readonly double conversionFactor;

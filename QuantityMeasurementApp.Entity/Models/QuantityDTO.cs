@@ -12,7 +12,7 @@ namespace QuantityMeasurementApp.Entity
         [MinLength(1, ErrorMessage = "Unit cannot be empty")]
         public string Unit { get; set; } = string.Empty;
 
-        [RegularExpression("^(Length|Volume|Weight|Temperature|Area|Angle|Speed|Time)Unit$", ErrorMessage = "MeasurementType must be LengthUnit, VolumeUnit, WeightUnit, TemperatureUnit, AreaUnit, AngleUnit, SpeedUnit, or TimeUnit.")]
+        [RegularExpression("(?i)^(Length|Volume|Weight|Temperature|Area|Angle|Speed|Time)Unit$", ErrorMessage = "MeasurementType must be LengthUnit, VolumeUnit, WeightUnit, TemperatureUnit, AreaUnit, AngleUnit, SpeedUnit, or TimeUnit.")]
         public string? MeasurementType { get; set; }
 
         public QuantityDTO() { }

@@ -318,5 +318,15 @@ namespace QuantityMeasurementApp.Service
         {
             return QuantityMeasurementDTO.FromEntityList(_repository.GetErrorMeasurements().ToList());
         }
+
+        public IEnumerable<QuantityMeasurementDTO> GetAllHistory()
+        {
+            return QuantityMeasurementDTO.FromEntityList(_repository.GetAllMeasurements().ToList());
+        }
+
+        public void ClearHistory()
+        {
+            _repository.DeleteAll();
+        }
     }
 }

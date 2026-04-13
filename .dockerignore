@@ -1,0 +1,11 @@
+**/.git
+**/.vs
+**/bin
+**/obj
+**/out
+**/*.user
+**/*.lock.json
+.idea
+.vscode
+Dockerfile
+.dockerignore

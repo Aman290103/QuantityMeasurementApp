@@ -101,5 +101,18 @@ namespace QuantityMeasurementApp.WebApi.Controllers
         {
             return Ok(_service.GetErrorHistory());
         }
+
+        [HttpGet("history/all")]
+        public ActionResult<IEnumerable<QuantityMeasurementDTO>> GetAllHistory()
+        {
+            return Ok(_service.GetAllHistory());
+        }
+
+        [HttpDelete("history/clear")]
+        public ActionResult ClearHistory()
+        {
+            _service.ClearHistory();
+            return NoContent();
+        }
     }
 }

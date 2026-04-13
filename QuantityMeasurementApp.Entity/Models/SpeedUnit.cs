@@ -4,8 +4,10 @@ namespace QuantityMeasurementApp.Entity
     public class SpeedUnit : IMeasurable
     {
         // Predefined speed units
-        public static readonly SpeedUnit MetersPerSecond = new SpeedUnit("MetersPerSecond", 1.0);
         public static readonly SpeedUnit KilometersPerHour = new SpeedUnit("KilometersPerHour", 1.0 / 3.6);
+        public static readonly SpeedUnit Kilometer = KilometersPerHour;
+        public static readonly SpeedUnit MetersPerSecond = new SpeedUnit("MetersPerSecond", 1.0);
+        public static readonly SpeedUnit Meter = MetersPerSecond;
         public static readonly SpeedUnit MilesPerHour = new SpeedUnit("MilesPerHour", 0.44704);
         public static readonly SpeedUnit Knots = new SpeedUnit("Knots", 0.514444);
 

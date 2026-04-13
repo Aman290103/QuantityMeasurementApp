@@ -24,5 +24,7 @@ namespace QuantityMeasurementApp.Service
         IEnumerable<QuantityMeasurementDTO> GetMeasurementsByType(string type);
         int GetOperationCount(string operation);
         IEnumerable<QuantityMeasurementDTO> GetErrorHistory();
+        IEnumerable<QuantityMeasurementDTO> GetAllHistory();
+        void ClearHistory();
     }
 }

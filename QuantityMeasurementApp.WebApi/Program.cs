@@ -49,7 +49,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     if (!string.IsNullOrEmpty(connectionString))
     {
-        options.UseSqlServer(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
+        options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
     }
     else
     {
