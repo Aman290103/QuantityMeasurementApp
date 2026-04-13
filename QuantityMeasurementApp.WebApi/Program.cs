@@ -54,7 +54,7 @@ if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("post
     var username = Uri.UnescapeDataString(userInfo[0]);
     var password = Uri.UnescapeDataString(userInfo[1]);
     var host = databaseUri.Host;
-    var port = databaseUri.Port;
+    var port = databaseUri.Port == -1 ? 5432 : databaseUri.Port; // Default to 5432 if port is missing
     var database = databaseUri.AbsolutePath.TrimStart('/');
     
     connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
