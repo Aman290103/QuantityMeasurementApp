@@ -111,6 +111,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Redirect root to Swagger
+app.MapGet("/", (context) => 
+{
+    context.Response.Redirect("/swagger");
+    return Task.CompletedTask;
+});
+
 // Migrate DataBase
 using (var scope = app.Services.CreateScope())
 {
