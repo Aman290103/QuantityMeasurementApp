@@ -62,29 +62,27 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else if (!isDevelopment && connectionString.StartsWith("postgres"))
     {
-        // Hand-parsing the URI to avoid Uri.Host truncation issues with dashes
-        var rawUrl = connectionString.Replace("postgresql://", "").Replace("postgres://", "");
-        var parts = rawUrl.Split('@');
-        var userPass = parts[0].Split(':');
-        var hostDb = parts[1].Split('/');
+        // Use a dummy HTTPS Uri to let .NET's most robust parser handle the complex components correctly
+        var dummyUrl = connectionString.Replace("postgresql://", "https://").Replace("postgres://", "https://");
+        var uri = new Uri(dummyUrl);
         
-        var username = Uri.UnescapeDataString(userPass[0]);
-        var password = Uri.UnescapeDataString(userPass[1]);
+        var userInfo = uri.UserInfo.Split(':');
+        var user = Uri.UnescapeDataString(userInfo[0]);
+        var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
         
-        var hostAndPort = hostDb[0].Split(':');
-        var host = hostAndPort[0];
-        var port = hostAndPort.Length > 1 ? int.Parse(hostAndPort[1]) : 5432;
-        var database = hostDb[1];
+        var host = uri.Host;
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        var db = uri.AbsolutePath.Trim('/');
 
-        // Ensure the full internal domain is used (common requirement for Render outside same cluster)
+        // Re-enforce the full internal domain for Render if missing
         if (!host.Contains("."))
         {
             host = $"{host}.oregon-postgres.render.com";
         }
 
-        var pgConnStr = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+        var pgConnStr = $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
         
-        Console.WriteLine($"[DEBUG] Connection Target -> Host: {host}, Database: {database}");
+        Console.WriteLine($"[DEBUG] Final Connection Target -> Host: {host}, Database: {db}");
 
         options.UseNpgsql(pgConnStr, b => 
         {
