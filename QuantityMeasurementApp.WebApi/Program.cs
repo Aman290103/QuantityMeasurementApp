@@ -70,8 +70,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         var host = databaseUri.Host;
         var port = databaseUri.Port == -1 ? 5432 : databaseUri.Port;
         var database = databaseUri.AbsolutePath.TrimStart('/');
-        var pgConnStr = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
-        options.UseNpgsql(pgConnStr, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
+        var pgConnStr = $"Host={host};Port={port};Database={database};Username={username};Password={password};Pooling=true;SSL Mode=Require;Trust Server Certificate=True;";
+        
+        Console.WriteLine($"[DEBUG] Connecting to PostgreSQL at {host}:{port}/{database}");
+        
+        options.UseNpgsql(pgConnStr, b => 
+        {
+            b.MigrationsAssembly("QuantityMeasurementApp.Repository");
+            b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+        });
     }
     else
     {
