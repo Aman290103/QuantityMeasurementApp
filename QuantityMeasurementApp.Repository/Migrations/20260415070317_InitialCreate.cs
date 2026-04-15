@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -17,15 +16,15 @@ namespace QuantityMeasurementApp.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    OperationType = table.Column<string>(type: "text", nullable: false),
-                    MeasurementType = table.Column<string>(type: "text", nullable: false),
-                    FirstOperand = table.Column<string>(type: "text", nullable: false),
-                    SecondOperand = table.Column<string>(type: "text", nullable: true),
-                    FinalResult = table.Column<string>(type: "text", nullable: false),
-                    HasError = table.Column<bool>(type: "boolean", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "text", nullable: true),
-                    RecordedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OperationType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MeasurementType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstOperand = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SecondOperand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FinalResult = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HasError = table.Column<bool>(type: "bit", nullable: false),
+                    ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RecordedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -37,11 +36,11 @@ namespace QuantityMeasurementApp.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FullName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

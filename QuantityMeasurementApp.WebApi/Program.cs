@@ -45,30 +45,38 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var isDevelopment = builder.Environment.IsDevelopment();
 
-// Handle Render's postgres:// URL format if necessary
-if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres"))
+// On Render, DATABASE_URL is set as an env var in postgres:// URI format
+var renderDatabaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (!string.IsNullOrEmpty(renderDatabaseUrl))
 {
-    var databaseUri = new Uri(connectionString);
-    var userInfo = databaseUri.UserInfo.Split(':');
-    var username = Uri.UnescapeDataString(userInfo[0]);
-    var password = Uri.UnescapeDataString(userInfo[1]);
-    var host = databaseUri.Host;
-    var port = databaseUri.Port == -1 ? 5432 : databaseUri.Port; // Default to 5432 if port is missing
-    var database = databaseUri.AbsolutePath.TrimStart('/');
-    
-    connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+    connectionString = renderDatabaseUrl;
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (!string.IsNullOrEmpty(connectionString))
+    if (string.IsNullOrEmpty(connectionString))
     {
-        options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
+        options.UseInMemoryDatabase("QuantityMeasurementDB");
+    }
+    else if (!isDevelopment && connectionString.StartsWith("postgres"))
+    {
+        // Production (Render): parse postgres:// URI and use Npgsql
+        var databaseUri = new Uri(connectionString);
+        var userInfo = databaseUri.UserInfo.Split(':');
+        var username = Uri.UnescapeDataString(userInfo[0]);
+        var password = Uri.UnescapeDataString(userInfo[1]);
+        var host = databaseUri.Host;
+        var port = databaseUri.Port == -1 ? 5432 : databaseUri.Port;
+        var database = databaseUri.AbsolutePath.TrimStart('/');
+        var pgConnStr = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        options.UseNpgsql(pgConnStr, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
     }
     else
     {
-        options.UseInMemoryDatabase("QuantityMeasurementDB");
+        // Development (local): use SQL Server (SSMS)
+        options.UseSqlServer(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
     }
 });
 
