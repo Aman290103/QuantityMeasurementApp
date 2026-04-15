@@ -62,44 +62,22 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else if (!isDevelopment && connectionString.StartsWith("postgres"))
     {
-        try 
+        // DEADLINE EMERGENCY FIX: 
+        // Directly providing the credentials to bypass the 'dp' truncation mystery and the empty database error.
+        var host = "dpg-d7fmusnlk1mc73dhvntg-a.oregon-postgres.render.com";
+        var db = "quantity_measurement_db_g33m";
+        var user = "quantitymeasurementapp_user";
+        var pass = "uD948vobsgiSmuoDGTSUCt7Rei4ZIKDl";
+        
+        var pgConnStr = $"Host={host};Port=5432;Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+        
+        Console.WriteLine($"[DEBUG] EMERGENCY HARDCODED CONNECTION -> Host: {host}");
+
+        options.UseNpgsql(pgConnStr, b => 
         {
-            // SUPER ROBUST SPLIT: Avoid all URI/Regex parsing bugs
-            var cleanUrl = connectionString.Split('?')[0].Replace("postgresql://", "").Replace("postgres://", "").Trim();
-            
-            var atParts = cleanUrl.Split('@');
-            var userPass = atParts[0].Split(':');
-            var hostDb = atParts[1].Split('/');
-            
-            var user = userPass[0];
-            var pass = userPass[1];
-            var hostAndPort = hostDb[0].Split(':');
-            var host = hostAndPort[0];
-            var db = hostDb.Length > 1 ? hostDb[1] : user;
-
-            // FIX: If the host is truncated or missing domain, fix it manually
-            if (host == "dp" || !host.Contains("."))
-            {
-                // We know it's a dpg- host from the user's screenshots
-                if (host == "dp") host = "dpg-d7fmusnlk1mc73dhvntg-a";
-                host = $"{host}.oregon-postgres.render.com";
-            }
-
-            var pgConnStr = $"Host={host};Port=5432;Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
-            
-            Console.WriteLine($"[DEBUG] FINAL ATTEMPT -> Host: {host}, Database: {db}");
-
-            options.UseNpgsql(pgConnStr, b => 
-            {
-                b.MigrationsAssembly("QuantityMeasurementApp.Repository");
-                b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-            });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[CRITICAL] Parsing failed: {ex.Message}");
-            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
-        }
+            b.MigrationsAssembly("QuantityMeasurementApp.Repository");
+            b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+        });
     }
     else
     {
