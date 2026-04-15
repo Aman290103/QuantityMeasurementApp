@@ -62,19 +62,29 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else if (!isDevelopment && connectionString.StartsWith("postgres"))
     {
-        // Use standard Npgsql connection string format derived from the postgres:// URI
+        // Use Npgsql's built-in parsing logic for the postgres:// URI
         var uri = new Uri(connectionString);
-        var db = uri.PathAndQuery.TrimStart('/');
-        var user = uri.UserInfo.Split(':')[0];
-        var pass = uri.UserInfo.Split(':')[1];
-        var port = uri.Port > 0 ? uri.Port : 5432;
-        var connStr = $"Server={uri.Host};Database={db};User Id={user};Password={pass};Port={port};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+        var userInfo = uri.UserInfo.Split(':');
+        
+        var builder_pg = new Npgsql.NpgsqlConnectionStringBuilder
+        {
+            Host = uri.Host,
+            Port = uri.Port > 0 ? uri.Port : 5432,
+            Database = uri.AbsolutePath.TrimStart('/'),
+            Username = Uri.UnescapeDataString(userInfo[0]),
+            Password = Uri.UnescapeDataString(userInfo[1]),
+            SslMode = Npgsql.SslMode.Require,
+            TrustServerCertificate = true,
+            Pooling = true
+        };
 
-        Console.WriteLine($"[DEBUG] Connecting to PostgreSQL Host={uri.Host}, Port={port}, Database={db}");
+        var pgConnStr = builder_pg.ToString();
+        Console.WriteLine($"[DEBUG] Connecting to PostgreSQL Host: {uri.Host}");
 
-        options.UseNpgsql(connStr, b => 
+        options.UseNpgsql(pgConnStr, b => 
         {
             b.MigrationsAssembly("QuantityMeasurementApp.Repository");
+            b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
         });
     }
     else
