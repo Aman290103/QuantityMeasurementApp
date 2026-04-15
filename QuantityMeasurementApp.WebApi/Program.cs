@@ -141,9 +141,18 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        Console.WriteLine("\n--- Applying Database Migrations (if any) ---");
-        dbContext.Database.Migrate();
-        Console.WriteLine("--- Database Migrations Applied Successfully ---\n");
+        Console.WriteLine("\n--- Preparing Database Schema ---");
+        if (isDevelopment)
+        {
+            dbContext.Database.Migrate();
+        }
+        else 
+        {
+            // For production (Postgres), EnsureCreated() is safer today 
+            // as it skips the SQL-Server-specific migration files.
+            dbContext.Database.EnsureCreated();
+        }
+        Console.WriteLine("--- Database Schema Ready ---\n");
     }
     catch (Exception ex)
     {
