@@ -148,8 +148,12 @@ using (var scope = app.Services.CreateScope())
         }
         else 
         {
-            // For production (Postgres), EnsureCreated() is safer today 
-            // as it skips the SQL-Server-specific migration files.
+            // Emergency: Drop the migration history table if it exists to let EnsureCreated 
+            // build the entire schema from scratch in PostgreSQL format.
+            try {
+                dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS \"__EFMigrationsHistory\" CASCADE;");
+            } catch { /* Ignore if it fails */ }
+            
             dbContext.Database.EnsureCreated();
         }
         Console.WriteLine("--- Database Schema Ready ---\n");
