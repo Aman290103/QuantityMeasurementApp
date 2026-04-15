@@ -62,19 +62,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else if (!isDevelopment && connectionString.StartsWith("postgres"))
     {
-        // Production (Render): parse postgres:// URI and use Npgsql
-        var databaseUri = new Uri(connectionString);
-        var userInfo = databaseUri.UserInfo.Split(':');
-        var username = Uri.UnescapeDataString(userInfo[0]);
-        var password = Uri.UnescapeDataString(userInfo[1]);
-        var host = databaseUri.Host;
-        var port = databaseUri.Port == -1 ? 5432 : databaseUri.Port;
-        var database = databaseUri.AbsolutePath.TrimStart('/');
-        var pgConnStr = $"Host={host};Port={port};Database={database};Username={username};Password={password};Pooling=true;SSL Mode=Require;Trust Server Certificate=True;";
-        
-        Console.WriteLine($"[DEBUG] Connecting to PostgreSQL at {host}:{port}/{database}");
-        
-        options.UseNpgsql(pgConnStr, b => 
+        // Use standard Npgsql connection string format derived from the postgres:// URI
+        var uri = new Uri(connectionString);
+        var db = uri.PathAndQuery.TrimStart('/');
+        var user = uri.UserInfo.Split(':')[0];
+        var pass = uri.UserInfo.Split(':')[1];
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        var connStr = $"Server={uri.Host};Database={db};User Id={user};Password={pass};Port={port};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+
+        Console.WriteLine($"[DEBUG] Connecting to PostgreSQL Host={uri.Host}, Port={port}, Database={db}");
+
+        options.UseNpgsql(connStr, b => 
         {
             b.MigrationsAssembly("QuantityMeasurementApp.Repository");
             b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
