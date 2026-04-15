@@ -62,36 +62,43 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else if (!isDevelopment && connectionString.StartsWith("postgres"))
     {
-        // Regex parsing: handles all special characters in passwords and long hosts perfectly
-        var match = System.Text.RegularExpressions.Regex.Match(connectionString, @"postgres(?:ql)?://([^:]+):([^@]+)@([^:/]+)(?::(\d+))?/([^?]+)");
-        
-        if (match.Success)
+        try 
         {
-            var user = match.Groups[1].Value;
-            var pass = match.Groups[2].Value;
-            var host = match.Groups[3].Value;
-            var port = match.Groups[4].Success ? match.Groups[4].Value : "5432";
-            var db = match.Groups[5].Value.TrimEnd('/');
-
-            if (!host.Contains("."))
+            // 1. Dual-Safety: Try a lenient Regex first
+            var match = System.Text.RegularExpressions.Regex.Match(connectionString, @"://(?<user>[^:]+):(?<pass>[^@]+)@(?<host>[^/:]+)(?::(?<port>\d+))?/(?<db>[^? \s]+)");
+            
+            string pgConnStr;
+            if (match.Success)
             {
-                host = $"{host}.oregon-postgres.render.com";
+                var user = match.Groups["user"].Value;
+                var pass = match.Groups["pass"].Value;
+                var host = match.Groups["host"].Value;
+                var port = match.Groups["port"].Success ? match.Groups["port"].Value : "5432";
+                var db = match.Groups["db"].Value;
+
+                if (!host.Contains(".")) host = $"{host}.oregon-postgres.render.com";
+
+                pgConnStr = $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+                Console.WriteLine($"[DEBUG] REGEX PARSE -> Host: {host}, DB: {db}");
+            }
+            else 
+            {
+                // 2. Fallback: Use Uri parsing with a scheme swap
+                var uri = new Uri(connectionString.Replace("postgres://", "http://").Replace("postgresql://", "http://"));
+                var host = uri.Host;
+                if (!host.Contains(".")) host = $"{host}.oregon-postgres.render.com";
+                
+                var userPass = uri.UserInfo.Split(':');
+                pgConnStr = $"Host={host};Port=5432;Database={uri.AbsolutePath.Trim('/')};Username={userPass[0]};Password={userPass[1]};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+                Console.WriteLine($"[DEBUG] URI FALLBACK -> Host: {host}");
             }
 
-            var pgConnStr = $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
-            
-            Console.WriteLine($"[DEBUG] REGEX PARSE SUCCESS -> Host: {host}, Database: {db}");
-
-            options.UseNpgsql(pgConnStr, b => 
-            {
-                b.MigrationsAssembly("QuantityMeasurementApp.Repository");
-                // Disabled retries temporarily to get the raw exception in Swagger
-                // b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-            });
+            options.UseNpgsql(pgConnStr, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
         }
-        else 
+        catch (Exception ex)
         {
-            Console.WriteLine("[DEBUG] REGEX PARSE FAILED - Using connection string as-is");
+            Console.WriteLine($"[CRITICAL ERROR] DB Parsing Failed: {ex.Message}");
+            // Final resort: hope it's already a connection string
             options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
         }
     }
