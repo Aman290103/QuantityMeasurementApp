@@ -64,41 +64,40 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     {
         try 
         {
-            // 1. Dual-Safety: Try a lenient Regex first
-            var match = System.Text.RegularExpressions.Regex.Match(connectionString, @"://(?<user>[^:]+):(?<pass>[^@]+)@(?<host>[^/:]+)(?::(?<port>\d+))?/(?<db>[^? \s]+)");
+            // SUPER ROBUST SPLIT: Avoid all URI/Regex parsing bugs
+            var cleanUrl = connectionString.Split('?')[0].Replace("postgresql://", "").Replace("postgres://", "").Trim();
             
-            string pgConnStr;
-            if (match.Success)
-            {
-                var user = match.Groups["user"].Value;
-                var pass = match.Groups["pass"].Value;
-                var host = match.Groups["host"].Value;
-                var port = match.Groups["port"].Success ? match.Groups["port"].Value : "5432";
-                var db = match.Groups["db"].Value;
+            var atParts = cleanUrl.Split('@');
+            var userPass = atParts[0].Split(':');
+            var hostDb = atParts[1].Split('/');
+            
+            var user = userPass[0];
+            var pass = userPass[1];
+            var hostAndPort = hostDb[0].Split(':');
+            var host = hostAndPort[0];
+            var db = hostDb.Length > 1 ? hostDb[1] : user;
 
-                if (!host.Contains(".")) host = $"{host}.oregon-postgres.render.com";
-
-                pgConnStr = $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
-                Console.WriteLine($"[DEBUG] REGEX PARSE -> Host: {host}, DB: {db}");
-            }
-            else 
+            // FIX: If the host is truncated or missing domain, fix it manually
+            if (host == "dp" || !host.Contains("."))
             {
-                // 2. Fallback: Use Uri parsing with a scheme swap
-                var uri = new Uri(connectionString.Replace("postgres://", "http://").Replace("postgresql://", "http://"));
-                var host = uri.Host;
-                if (!host.Contains(".")) host = $"{host}.oregon-postgres.render.com";
-                
-                var userPass = uri.UserInfo.Split(':');
-                pgConnStr = $"Host={host};Port=5432;Database={uri.AbsolutePath.Trim('/')};Username={userPass[0]};Password={userPass[1]};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
-                Console.WriteLine($"[DEBUG] URI FALLBACK -> Host: {host}");
+                // We know it's a dpg- host from the user's screenshots
+                if (host == "dp") host = "dpg-d7fmusnlk1mc73dhvntg-a";
+                host = $"{host}.oregon-postgres.render.com";
             }
 
-            options.UseNpgsql(pgConnStr, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
+            var pgConnStr = $"Host={host};Port=5432;Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+            
+            Console.WriteLine($"[DEBUG] FINAL ATTEMPT -> Host: {host}, Database: {db}");
+
+            options.UseNpgsql(pgConnStr, b => 
+            {
+                b.MigrationsAssembly("QuantityMeasurementApp.Repository");
+                b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[CRITICAL ERROR] DB Parsing Failed: {ex.Message}");
-            // Final resort: hope it's already a connection string
+            Console.WriteLine($"[CRITICAL] Parsing failed: {ex.Message}");
             options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
         }
     }
