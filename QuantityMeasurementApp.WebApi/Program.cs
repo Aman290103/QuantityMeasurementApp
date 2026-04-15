@@ -78,6 +78,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             b.MigrationsAssembly("QuantityMeasurementApp.Repository");
             b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
         });
+
+        // Ignore the warning about pending model changes (EF Core 9/10 feature) to let the app start
+        options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
     }
     else
     {
