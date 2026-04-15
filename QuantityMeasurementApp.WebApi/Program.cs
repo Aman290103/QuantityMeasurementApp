@@ -75,7 +75,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connStr, b => 
         {
             b.MigrationsAssembly("QuantityMeasurementApp.Repository");
-            b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
         });
     }
     else
