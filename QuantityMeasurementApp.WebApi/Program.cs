@@ -100,11 +100,11 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
+app.UseCors("AllowAll");
+
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
-
-app.UseCors("AllowAll");
 
 app.UseExceptionHandler();
 app.UseAuthentication();
