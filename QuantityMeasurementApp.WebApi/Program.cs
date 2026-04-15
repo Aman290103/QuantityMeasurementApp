@@ -62,45 +62,38 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else if (!isDevelopment && connectionString.StartsWith("postgres"))
     {
-        // Strip query parameters (?sslmode=...) and trailing slashes
-        var urlWithoutQuery = connectionString.Split('?')[0];
-        var cleanUrl = urlWithoutQuery.Replace("postgresql://", "").Replace("postgres://", "").Trim();
+        // Regex parsing: handles all special characters in passwords and long hosts perfectly
+        var match = System.Text.RegularExpressions.Regex.Match(connectionString, @"postgres(?:ql)?://([^:]+):([^@]+)@([^:/]+)(?::(\d+))?/([^?]+)");
         
-        var atIndex = cleanUrl.LastIndexOf('@');
-        var userInfo = cleanUrl.Substring(0, atIndex);
-        var hostAndDb = cleanUrl.Substring(atIndex + 1).TrimEnd('/');
-
-        var firstSlash = hostAndDb.IndexOf('/');
-        var hostAndPort = firstSlash > -1 ? hostAndDb.Substring(0, firstSlash) : hostAndDb;
-        var db = firstSlash > -1 ? hostAndDb.Substring(firstSlash + 1) : "";
-
-        var user = userInfo.Split(':')[0];
-        var pass = userInfo.Contains(':') ? userInfo.Split(':')[1] : "";
-
-        var host = hostAndPort.Contains(':') ? hostAndPort.Split(':')[0] : hostAndPort;
-        var port = hostAndPort.Contains(':') ? hostAndPort.Split(':')[1] : "5432";
-
-        // Enforce full internal domain for Render if missing
-        if (!host.Contains("."))
+        if (match.Success)
         {
-            host = $"{host}.oregon-postgres.render.com";
+            var user = match.Groups[1].Value;
+            var pass = match.Groups[2].Value;
+            var host = match.Groups[3].Value;
+            var port = match.Groups[4].Success ? match.Groups[4].Value : "5432";
+            var db = match.Groups[5].Value.TrimEnd('/');
+
+            if (!host.Contains("."))
+            {
+                host = $"{host}.oregon-postgres.render.com";
+            }
+
+            var pgConnStr = $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
+            
+            Console.WriteLine($"[DEBUG] REGEX PARSE SUCCESS -> Host: {host}, Database: {db}");
+
+            options.UseNpgsql(pgConnStr, b => 
+            {
+                b.MigrationsAssembly("QuantityMeasurementApp.Repository");
+                // Disabled retries temporarily to get the raw exception in Swagger
+                // b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            });
         }
-
-        // Fallback: In Postgres, username is often the database name if unspecified
-        if (string.IsNullOrEmpty(db))
+        else 
         {
-            db = user;
+            Console.WriteLine("[DEBUG] REGEX PARSE FAILED - Using connection string as-is");
+            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementApp.Repository"));
         }
-
-        var pgConnStr = $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
-        
-        Console.WriteLine($"[DEBUG] REFINED CONFIG -> Host: {host}, Database: {db}, Username: {user}");
-
-        options.UseNpgsql(pgConnStr, b => 
-        {
-            b.MigrationsAssembly("QuantityMeasurementApp.Repository");
-            b.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-        });
     }
     else
     {
