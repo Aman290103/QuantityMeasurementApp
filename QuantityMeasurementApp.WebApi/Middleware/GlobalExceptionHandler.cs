@@ -30,12 +30,16 @@ namespace QuantityMeasurementApp.WebApi.Middleware
                 error = "Bad Request";
             }
 
+            var errorMessage = exception.InnerException != null 
+                ? $"{exception.Message} | Inner Error: {exception.InnerException.Message}" 
+                : exception.Message;
+
             var problemDetails = new
             {
                 timestamp = DateTime.UtcNow.ToString("O"),
                 status = statusCode,
                 error = error,
-                message = message,
+                message = errorMessage,
                 path = httpContext.Request.Path.Value
             };
 
