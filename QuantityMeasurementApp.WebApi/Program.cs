@@ -79,7 +79,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         };
 
         var pgConnStr = builder_pg.ToString();
-        Console.WriteLine($"[DEBUG] Connecting to PostgreSQL Host: {uri.Host}");
+        
+        // Detailed logging to see what is actually being parsed
+        Console.WriteLine($"[DEBUG] Connection Attempt Details:");
+        Console.WriteLine($"[DEBUG] Host: {uri.Host}");
+        Console.WriteLine($"[DEBUG] Port: {builder_pg.Port}");
+        Console.WriteLine($"[DEBUG] Database: {builder_pg.Database}");
+        Console.WriteLine($"[DEBUG] Username: {builder_pg.Username}");
 
         options.UseNpgsql(pgConnStr, b => 
         {
