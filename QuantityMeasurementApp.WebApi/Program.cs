@@ -62,19 +62,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else if (!isDevelopment && connectionString.StartsWith("postgres"))
     {
-        // Use a dummy HTTPS Uri to let .NET's most robust parser handle the complex components correctly
-        var dummyUrl = connectionString.Replace("postgresql://", "https://").Replace("postgres://", "https://");
-        var uri = new Uri(dummyUrl);
-        
-        var userInfo = uri.UserInfo.Split(':');
-        var user = Uri.UnescapeDataString(userInfo[0]);
-        var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
-        
-        var host = uri.Host;
-        var port = uri.Port > 0 ? uri.Port : 5432;
-        var db = uri.AbsolutePath.Trim('/');
+        // Manual substring parsing to be 100% sure we don't truncate the host or mess up the port
+        var cleanUrl = connectionString.Replace("postgresql://", "").Replace("postgres://", "").Trim();
+        var atIndex = cleanUrl.LastIndexOf('@');
+        var userInfo = cleanUrl.Substring(0, atIndex);
+        var hostAndDb = cleanUrl.Substring(atIndex + 1);
 
-        // Re-enforce the full internal domain for Render if missing
+        var firstSlash = hostAndDb.IndexOf('/');
+        var hostAndPort = firstSlash > -1 ? hostAndDb.Substring(0, firstSlash) : hostAndDb;
+        var db = (firstSlash > -1 && firstSlash < hostAndDb.Length - 1) ? hostAndDb.Substring(firstSlash + 1) : "";
+
+        var user = userInfo.Split(':')[0];
+        var pass = userInfo.Contains(':') ? userInfo.Split(':')[1] : "";
+
+        var host = hostAndPort.Contains(':') ? hostAndPort.Split(':')[0] : hostAndPort;
+        var port = hostAndPort.Contains(':') ? hostAndPort.Split(':')[1] : "5432";
+
+        // Enforce the full Render domain if it was missing or truncated
         if (!host.Contains("."))
         {
             host = $"{host}.oregon-postgres.render.com";
@@ -82,7 +86,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
         var pgConnStr = $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true;Pooling=true;";
         
-        Console.WriteLine($"[DEBUG] Final Connection Target -> Host: {host}, Database: {db}");
+        Console.WriteLine($"[DEBUG] FINAL CONFIG -> Host: {host}, DB: {db}, Port: {port}");
 
         options.UseNpgsql(pgConnStr, b => 
         {
