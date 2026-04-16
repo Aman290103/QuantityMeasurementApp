@@ -5,11 +5,6 @@ using QuantityMeasurementApp.Service;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Quantity Measurement Service", Version = "v1" });
-});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var renderDatabaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -41,8 +36,7 @@ builder.Services.AddScoped<IQuantityMeasurementService, QuantityMeasurementServi
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.MapGet("/", () => "Measurement Service is Running!");
 app.MapControllers();
 
 app.Run();

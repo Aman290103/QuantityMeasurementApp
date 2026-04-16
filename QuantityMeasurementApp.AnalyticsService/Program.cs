@@ -17,7 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     if (string.IsNullOrEmpty(connectionString))
     {
-        options.UseInMemoryDatabase("HistoryDB");
+        options.UseInMemoryDatabase("AnalyticsDB");
     }
     else
     {
@@ -36,7 +36,7 @@ builder.Services.AddScoped<IQuantityMeasurementService, QuantityMeasurementServi
 
 var app = builder.Build();
 
-app.MapGet("/", () => "History Service is Running!");
+app.MapGet("/", () => "Analytics Service is Running!");
 app.MapControllers();
 
 app.Run();
