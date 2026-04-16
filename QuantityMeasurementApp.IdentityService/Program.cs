@@ -8,6 +8,15 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiDocument(config =>
+{
+    config.PostProcess = document =>
+    {
+        document.Info.Title = "Quantity Measurement Identity Service";
+        document.Info.Version = "v1";
+    };
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -61,6 +70,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 var app = builder.Build();
 
 app.UseCors("AllowAll");
+app.UseOpenApi();
+app.UseSwaggerUi(config => 
+{
+    config.Path = "/swagger";
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapGet("/", () => "Identity Service is Running!");

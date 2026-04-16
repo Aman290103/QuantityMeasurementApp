@@ -5,6 +5,15 @@ using QuantityMeasurementApp.Service;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiDocument(config =>
+{
+    config.PostProcess = document =>
+    {
+        document.Info.Title = "Quantity History Service";
+        document.Info.Version = "v1";
+    };
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var renderDatabaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
@@ -37,6 +46,11 @@ builder.Services.AddScoped<IQuantityMeasurementService, QuantityMeasurementServi
 var app = builder.Build();
 
 app.MapGet("/", () => "History Service is Running!");
+app.UseOpenApi();
+app.UseSwaggerUi(config => 
+{
+    config.Path = "/swagger";
+});
 app.MapControllers();
 
 app.Run();
